@@ -32,12 +32,43 @@ body.app-bg {
             linear-gradient(180deg, var(--bg0), var(--bg1));
 }
 
-/* Nice selection (small, but it matters) */
+/* Make typography look expensive by default */
+body {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 ::selection {
     background: rgba(17, 24, 39, 0.14);
 }
 
-/* Keep your existing custom prose helper, but make it cleaner */
+/* === “Card system” helpers === */
+.shadow-soft {
+    box-shadow: var(--shadow);
+}
+
+/* If you keep using border-zinc-200 in components, it's fine.
+   But this helps glass cards look consistent when you use bg-white/xx. */
+.glass {
+    background: var(--card);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.glass-hover:hover {
+    box-shadow: var(--shadowHover);
+}
+
+/* Better focus ring (subtle, not cheap neon) */
+:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(24, 24, 27, 0.10);
+    border-radius: 12px;
+}
+
+/* === Prose tweaks (your helper, but upgraded) === */
 .prose-clean ul {
     list-style: disc;
     padding-left: 1.25rem;
@@ -47,17 +78,29 @@ body.app-bg {
     padding-left: 1.25rem;
 }
 .prose-clean li {
-    margin: 0.25rem 0;
+    margin: 0.28rem 0;
 }
 .prose-clean p {
-    margin: 0.5rem 0;
+    margin: 0.55rem 0;
 }
 .prose-clean a {
     text-decoration: underline;
     text-underline-offset: 3px;
 }
 
-/* Reusable shadow class (you already use "shadow-soft") */
-.shadow-soft {
-    box-shadow: var(--shadow);
+/* Make markdown lists in hero/services nicer (less “Word doc”) */
+.prose ul > li::marker,
+.prose-clean ul > li::marker {
+    color: rgba(24, 24, 27, 0.45);
+}
+
+.prose p,
+.prose-clean p {
+    line-height: 1.65;
+}
+
+/* Optional: slightly “editorial” headings in markdown blocks */
+.prose h2,
+.prose-clean h2 {
+    letter-spacing: -0.02em;
 }
