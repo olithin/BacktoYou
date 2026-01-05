@@ -2,105 +2,88 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global theme tokens (no magic numbers) */
-:root {
+:root{
     color-scheme: light;
 
-    --bg0: #fafafa;
-    --bg1: #f4f4f5;
+    /* Boutique palette */
+    --bg0: #fbfaf7;      /* warm ivory */
+    --bg1: #f4f1eb;      /* slightly deeper */
+    --ink: #111827;      /* charcoal */
+    --muted: rgba(17,24,39,0.62);
 
-    --card: rgba(255, 255, 255, 0.82);
-    --border: rgba(24, 24, 27, 0.10);
+    --card: rgba(255,255,255,0.78);
+    --border: rgba(17,24,39,0.10);
 
-    --shadow: 0 12px 40px rgba(17, 24, 39, 0.10);
-    --shadowHover: 0 20px 55px rgba(17, 24, 39, 0.14);
+    /* Accent */
+    --accent: #6b6a4a;          /* olive */
+    --accent2: #b79b5b;         /* soft gold */
+    --accentSoft: rgba(183,155,91,0.18);
 
-    --ring: rgba(24, 24, 27, 0.18);
+    --shadow: 0 16px 50px rgba(17, 24, 39, 0.10);
+    --shadowHover: 0 26px 70px rgba(17, 24, 39, 0.14);
+
+    --ring: rgba(183,155,91,0.35);
+
+    /* Fonts (loaded via index.html) */
+    --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", sans-serif;
+    /* Key part: Noto Serif as Greek-safe fallback for editorial headings */
+    --font-serif: "Fraunces", "Noto Serif", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
-html {
-    scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
-body.app-bg {
+body.app-bg{
     min-height: 100vh;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    color: var(--ink);
 
-    /* Premium-ish background: soft light + subtle depth */
     background:
-            radial-gradient(1200px 600px at 10% -10%, rgba(15, 23, 42, 0.06), transparent 60%),
-            radial-gradient(900px 500px at 90% 0%, rgba(24, 24, 27, 0.04), transparent 55%),
+            radial-gradient(1200px 700px at 10% -10%, rgba(183,155,91,0.12), transparent 60%),
+            radial-gradient(900px 600px at 95% 5%, rgba(107,106,74,0.10), transparent 55%),
             linear-gradient(180deg, var(--bg0), var(--bg1));
 }
 
-/* Make typography look expensive by default */
-body {
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+.font-editorial{
+    font-family: "Noto Serif Display", "Noto Serif", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    letter-spacing: -0.02em;
 }
 
-::selection {
-    background: rgba(17, 24, 39, 0.14);
+/* Nice selection */
+::selection { background: rgba(183,155,91,0.22); }
+
+/* Premium divider */
+.hr-soft{
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(17,24,39,0.10), transparent);
 }
 
-/* === “Card system” helpers === */
-.shadow-soft {
-    box-shadow: var(--shadow);
+/* Links look more “brand” */
+a {
+    color: var(--accent);
+    text-underline-offset: 3px;
+}
+a:hover {
+    color: var(--accent2);
 }
 
-/* If you keep using border-zinc-200 in components, it's fine.
-   But this helps glass cards look consistent when you use bg-white/xx. */
-.glass {
-    background: var(--card);
-    border: 1px solid var(--border);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-
-.glass-hover:hover {
-    box-shadow: var(--shadowHover);
-}
-
-/* Better focus ring (subtle, not cheap neon) */
-:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 4px rgba(24, 24, 27, 0.10);
-    border-radius: 12px;
-}
-
-/* === Prose tweaks (your helper, but upgraded) === */
-.prose-clean ul {
-    list-style: disc;
-    padding-left: 1.25rem;
-}
-.prose-clean ol {
-    list-style: decimal;
-    padding-left: 1.25rem;
-}
-.prose-clean li {
-    margin: 0.28rem 0;
-}
-.prose-clean p {
-    margin: 0.55rem 0;
-}
+/* Prose helper */
+.prose-clean ul { list-style: disc; padding-left: 1.25rem; }
+.prose-clean ol { list-style: decimal; padding-left: 1.25rem; }
+.prose-clean li { margin: 0.25rem 0; }
+.prose-clean p { margin: 0.55rem 0; }
 .prose-clean a {
     text-decoration: underline;
     text-underline-offset: 3px;
 }
 
-/* Make markdown lists in hero/services nicer (less “Word doc”) */
-.prose ul > li::marker,
-.prose-clean ul > li::marker {
-    color: rgba(24, 24, 27, 0.45);
+/* Ensure bold/italic inside markdown doesn’t switch to a broken font */
+.prose strong,
+.prose b,
+.prose em,
+.prose i{
+    font-family: inherit;
 }
 
-.prose p,
-.prose-clean p {
-    line-height: 1.65;
-}
-
-/* Optional: slightly “editorial” headings in markdown blocks */
-.prose h2,
-.prose-clean h2 {
-    letter-spacing: -0.02em;
-}
+/* Shadows */
+.shadow-soft { box-shadow: var(--shadow); }
+.shadow-soft-hover { box-shadow: var(--shadowHover); }
