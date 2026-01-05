@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6d0b432-56d5-45c0-ab0c-b4f8773b302c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/pages/HomePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/HomePage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AdminPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AdminPage.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +61,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1767644642998</updated>
-      <workItem from="1767644644109" duration="4865000" />
+      <workItem from="1767644644109" duration="6918000" />
     </task>
     <task id="LOCAL-00001" summary="fix project">
       <option name="closed" value="true" />
@@ -86,7 +87,31 @@
       <option name="project" value="LOCAL" />
       <updated>1767649713999</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="first course">
+      <option name="closed" value="true" />
+      <created>1767650425210</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1767650425210</updated>
+    </task>
+    <task id="LOCAL-00005" summary="added clickable block">
+      <option name="closed" value="true" />
+      <created>1767650470901</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1767650470901</updated>
+    </task>
+    <task id="LOCAL-00006" summary="change shrift">
+      <option name="closed" value="true" />
+      <created>1767651428911</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1767651428911</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -99,7 +124,10 @@
     <MESSAGE value="fix project" />
     <MESSAGE value="first added" />
     <MESSAGE value="first block" />
-    <option name="LAST_COMMIT_MESSAGE" value="first block" />
+    <MESSAGE value="first course" />
+    <MESSAGE value="added clickable block" />
+    <MESSAGE value="change shrift" />
+    <option name="LAST_COMMIT_MESSAGE" value="change shrift" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

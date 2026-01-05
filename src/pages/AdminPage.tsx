@@ -95,24 +95,12 @@ function MdEditor(props: { label: string; value: string; onChange: (v: string) =
                         {props.hint ? <Hint>{props.hint}</Hint> : null}
                     </div>
                     <div className="flex flex-wrap gap-1">
-                        <ToolBtn title="Bold" onClick={() => wrap("**", "**")}>
-                            B
-                        </ToolBtn>
-                        <ToolBtn title="Italic" onClick={() => wrap("*", "*")}>
-                            I
-                        </ToolBtn>
-                        <ToolBtn title="H2" onClick={() => prefixLines(() => "## ")}>
-                            H2
-                        </ToolBtn>
-                        <ToolBtn title="Bulleted list" onClick={() => prefixLines(() => "- ")}>
-                            •
-                        </ToolBtn>
-                        <ToolBtn title="Numbered list" onClick={() => prefixLines((i) => `${i + 1}. `)}>
-                            1.
-                        </ToolBtn>
-                        <ToolBtn title="Link" onClick={insertLink}>
-                            🔗
-                        </ToolBtn>
+                        <ToolBtn title="Bold" onClick={() => wrap("**", "**")}>B</ToolBtn>
+                        <ToolBtn title="Italic" onClick={() => wrap("*", "*")}>I</ToolBtn>
+                        <ToolBtn title="H2" onClick={() => prefixLines(() => "## ")}>H2</ToolBtn>
+                        <ToolBtn title="Bulleted list" onClick={() => prefixLines(() => "- ")}>•</ToolBtn>
+                        <ToolBtn title="Numbered list" onClick={() => prefixLines((i) => `${i + 1}. `)}>1.</ToolBtn>
+                        <ToolBtn title="Link" onClick={insertLink}>🔗</ToolBtn>
                     </div>
                 </div>
 
@@ -124,7 +112,9 @@ function MdEditor(props: { label: string; value: string; onChange: (v: string) =
                     className="mt-1 font-mono text-sm"
                 />
 
-                <div className="mt-2 text-xs text-zinc-500">Formatting: Markdown (supports **bold**, *italic*, lists, headings, links).</div>
+                <div className="mt-2 text-xs text-zinc-500">
+                    Formatting: Markdown (supports **bold**, *italic*, lists, headings, links).
+                </div>
             </div>
 
             <div>
@@ -173,9 +163,7 @@ function ImageCropModal(props: {
             <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-soft border border-zinc-200 overflow-hidden">
                 <div className="p-4 border-b border-zinc-200 flex items-center justify-between">
                     <div className="font-semibold">{props.title}</div>
-                    <Button type="button" variant="ghost" onClick={props.onCancel}>
-                        Close
-                    </Button>
+                    <Button type="button" variant="ghost" onClick={props.onCancel}>Close</Button>
                 </div>
 
                 <div className="p-4 grid md:grid-cols-[1fr,280px] gap-4">
@@ -235,12 +223,8 @@ function ImageCropModal(props: {
                         </div>
 
                         <div className="flex gap-2 pt-2">
-                            <Button type="button" onClick={save} disabled={!cropPixels}>
-                                Use image
-                            </Button>
-                            <Button type="button" variant="ghost" onClick={props.onCancel}>
-                                Cancel
-                            </Button>
+                            <Button type="button" onClick={save} disabled={!cropPixels}>Use image</Button>
+                            <Button type="button" variant="ghost" onClick={props.onCancel}>Cancel</Button>
                         </div>
 
                         <div className="text-xs text-zinc-500">
@@ -551,9 +535,7 @@ Full description…`,
                                 to={`/${l}/admin`}
                                 className={
                                     "px-2 py-1 rounded border text-xs " +
-                                    (l === locale
-                                        ? "bg-zinc-900 text-white border-zinc-900"
-                                        : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50")
+                                    (l === locale ? "bg-zinc-900 text-white border-zinc-900" : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50")
                                 }
                             >
                                 {l.toUpperCase()}
@@ -621,56 +603,63 @@ Full description…`,
 
                 <div>
                     <Label>Subtitle</Label>
-                    <Textarea
-                        value={blocks.hero.subtitle}
-                        onChange={(e) => patchHero({ subtitle: e.target.value })}
-                        className="mt-1"
-                        rows={3}
-                    />
+                    <Textarea value={blocks.hero.subtitle} onChange={(e) => patchHero({ subtitle: e.target.value })} className="mt-1" rows={3} />
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                     <div>
                         <Label>Primary CTA Text</Label>
-                        <Input
-                            value={blocks.hero.primaryCtaText}
-                            onChange={(e) => patchHero({ primaryCtaText: e.target.value })}
-                            className="mt-1"
-                        />
+                        <Input value={blocks.hero.primaryCtaText} onChange={(e) => patchHero({ primaryCtaText: e.target.value })} className="mt-1" />
                     </div>
                     <div>
                         <Label>Primary CTA Href</Label>
-                        <Input
-                            value={blocks.hero.primaryCtaHref}
-                            onChange={(e) => patchHero({ primaryCtaHref: e.target.value })}
-                            className="mt-1"
-                        />
+                        <Input value={blocks.hero.primaryCtaHref} onChange={(e) => patchHero({ primaryCtaHref: e.target.value })} className="mt-1" />
                     </div>
                     <div>
                         <Label>Secondary CTA Text</Label>
-                        <Input
-                            value={blocks.hero.secondaryCtaText}
-                            onChange={(e) => patchHero({ secondaryCtaText: e.target.value })}
-                            className="mt-1"
-                        />
+                        <Input value={blocks.hero.secondaryCtaText} onChange={(e) => patchHero({ secondaryCtaText: e.target.value })} className="mt-1" />
                     </div>
                     <div>
                         <Label>Secondary CTA Href</Label>
-                        <Input
-                            value={blocks.hero.secondaryCtaHref}
-                            onChange={(e) => patchHero({ secondaryCtaHref: e.target.value })}
-                            className="mt-1"
-                        />
+                        <Input value={blocks.hero.secondaryCtaHref} onChange={(e) => patchHero({ secondaryCtaHref: e.target.value })} className="mt-1" />
                     </div>
                 </div>
             </Card>
 
             <Card className="p-6 space-y-4">
                 <div className="text-lg font-semibold">About</div>
+
                 <div>
                     <Label>Title</Label>
                     <Input value={blocks.about.title} onChange={(e) => patchAbout({ title: e.target.value })} className="mt-1" />
                 </div>
+
+                {/* FE: Premium highlights under About title (3 short lines). */}
+                <div>
+                    <Label>Highlights (3 short lines)</Label>
+                    <Hint>Shown as mini-cards under About on the website.</Hint>
+
+                    <div className="grid md:grid-cols-3 gap-3 mt-2">
+                        {[0, 1, 2].map((i) => {
+                            const current = blocks.about.highlights ?? ["", "", ""];
+                            return (
+                                <div key={i}>
+                                    <Label>{`Highlight ${i + 1}`}</Label>
+                                    <Input
+                                        className="mt-1"
+                                        value={current[i] ?? ""}
+                                        onChange={(e) => {
+                                            const next = [...current];
+                                            next[i] = e.target.value;
+                                            patchAbout({ highlights: next });
+                                        }}
+                                    />
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
                 <MdEditor label="Body (Markdown)" value={blocks.about.bodyMd} onChange={(v) => patchAbout({ bodyMd: v })} />
             </Card>
 
@@ -683,11 +672,7 @@ Full description…`,
                     </div>
                     <div>
                         <Label>Subtitle</Label>
-                        <Input
-                            value={blocks.services.subtitle}
-                            onChange={(e) => patchServicesBlock({ subtitle: e.target.value })}
-                            className="mt-1"
-                        />
+                        <Input value={blocks.services.subtitle} onChange={(e) => patchServicesBlock({ subtitle: e.target.value })} className="mt-1" />
                     </div>
                 </div>
             </Card>
