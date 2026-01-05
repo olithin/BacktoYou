@@ -15,6 +15,15 @@ function SectionTitle(props: { title: string; subtitle?: string; id?: string }) 
     </div>
   );
 }
+function HeroSubtitle(props: { md: string }) {
+    const html = useMemo(() => mdToSafeHtml(props.md), [props.md]);
+    return (
+        <div
+            className="mt-3 text-zinc-700 prose max-w-none prose-zinc prose-ul:pl-5 prose-li:my-1"
+            dangerouslySetInnerHTML={{ __html: html }}
+        />
+    );
+}
 
 function Hero(props: { model: ContentModel }) {
   const hero = props.model.blocks.hero;
@@ -24,7 +33,7 @@ function Hero(props: { model: ContentModel }) {
         <div>
           <div className="text-sm text-zinc-500">{props.model.site.tagline}</div>
           <h1 className="text-4xl md:text-5xl font-semibold tracking-tight mt-2">{hero.title}</h1>
-          <p className="text-zinc-700 mt-3">{hero.subtitle}</p>
+            <HeroSubtitle md={hero.subtitle} />
           <div className="flex gap-3 mt-5">
             <Button onClick={() => (window.location.href = hero.primaryCtaHref)}>{hero.primaryCtaText}</Button>
             <Button variant="ghost" onClick={() => (window.location.href = hero.secondaryCtaHref)}>

@@ -17,7 +17,7 @@
       "blocks": {
         "hero": {
           "title": "Back to You",
-          "subtitle": "Simple, calm, effective. Because your time is not a hobby.",
+          "subtitle": "A safe space to understand what’s happening and what you need.\n\n- **Listening without judgment.** With respect and confidentiality.\n- **Understanding & empowerment.** We find the roots and build resilience.\n- **Action in small steps.** Realistic changes that last.\n",
           "primaryCtaText": "Book a session",
           "primaryCtaHref": "#services",
           "secondaryCtaText": "Learn more",
@@ -81,7 +81,7 @@
       "blocks": {
         "hero": {
           "title": "Back to You",
-          "subtitle": "Simple, calm, effective. Because your time is not a hobby.",
+          "subtitle": "Безопасное пространство, чтобы понять, что с вами происходит и что вам нужно.\n\n- **Без осуждения.** С уважением и конфиденциальностью.\n- **Понимание и поддержка.** Находим причины и укрепляем устойчивость.\n- **Маленькие шаги к изменениям.** Реальные перемены, которые остаются.\n",
           "primaryCtaText": "Записаться",
           "primaryCtaHref": "#services",
           "secondaryCtaText": "Подробнее",
@@ -145,7 +145,7 @@
       "blocks": {
         "hero": {
           "title": "Πώς μπορώ να σας στηρίξω",
-          "subtitle": "Σας βοηθάω να αντιμετωπίζετε κρίσιμες και μπερδεμένες καταστάσεις.\nΣας δείχνω πώς να ενισχύσετε την αυτοεκτίμησή σας και να αγαπήσετε τον εαυτό σας.\nΣας μαθαίνω πώς να ξεφύγετε από τον ρόλο του θύματος και να ενεργοποιήσετε τον μηχανισμό θεραπείας από τοξικές σχέσεις και προβλήματα υγείας.",
+          "subtitle": "Ένας ασφαλής χώρος για να καταλάβετε τι σας συμβαίνει και τι χρειάζεστε.\n\n- **Ακρόαση χωρίς κριτική.** Με σεβασμό και εχεμύθεια.\n- **Κατανόηση & ενδυνάμωση.** Βρίσκουμε τις ρίζες και χτίζουμε ανθεκτικότητα.\n- **Πράξη με μικρά βήματα.** Ρεαλιστικές αλλαγές που κρατάνε.\n",
           "primaryCtaText": "Κλείσε ραντεβού",
           "primaryCtaHref": "#services",
           "secondaryCtaText": "Μάθε περισσότερα",
