@@ -95,11 +95,7 @@ function ServiceCardView(props: { svc: ServiceCard; locale: Locale }) {
             <Card className="p-5 cursor-pointer select-none transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_20px_55px_rgba(17,24,39,0.14)] focus-within:ring-2 focus-within:ring-zinc-300">
                 <div className="flex items-start gap-4">
                     {props.svc.imageUrl ? (
-                        <img
-                            src={props.svc.imageUrl}
-                            alt=""
-                            className="w-16 h-16 rounded-xl object-cover border border-black/10"
-                        />
+                        <img src={props.svc.imageUrl} alt="" className="w-16 h-16 rounded-xl object-cover border border-black/10" />
                     ) : (
                         <div className="w-16 h-16 rounded-xl bg-white/60 border border-black/10" />
                     )}

@@ -2,95 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global theme tokens (no magic numbers) */
 :root {
     color-scheme: light;
 
-    /* Premium tokens */
-    --bg: #fbfaf8;           /* warm off-white */
-    --bg2: #f6f3ee;          /* warmer tint */
-    --ink: #111827;          /* deep ink */
-    --muted: #6b7280;        /* zinc-500/600 */
+    --bg0: #fafafa;
+    --bg1: #f4f4f5;
+
     --card: rgba(255, 255, 255, 0.82);
-    --border: rgba(17, 24, 39, 0.10);
-    --shadow: 0 16px 50px rgba(17, 24, 39, 0.10);
-    --shadow2: 0 10px 30px rgba(17, 24, 39, 0.08);
+    --border: rgba(24, 24, 27, 0.10);
+
+    --shadow: 0 12px 40px rgba(17, 24, 39, 0.10);
+    --shadowHover: 0 20px 55px rgba(17, 24, 39, 0.14);
+
+    --ring: rgba(24, 24, 27, 0.18);
 }
 
-/* Global page background: gradient + subtle noise (no images) */
-html,
-body {
-    height: 100%;
+html {
+    scroll-behavior: smooth;
 }
 
-body {
-    color: var(--ink);
+body.app-bg {
+    min-height: 100vh;
+
+    /* Premium-ish background: soft light + subtle depth */
     background:
-            radial-gradient(1200px 600px at 20% 0%, var(--bg2), transparent 60%),
-            radial-gradient(1000px 700px at 90% 10%, #f1f5f9, transparent 55%),
-            linear-gradient(180deg, var(--bg), #ffffff 65%);
+            radial-gradient(1200px 600px at 10% -10%, rgba(15, 23, 42, 0.06), transparent 60%),
+            radial-gradient(900px 500px at 90% 0%, rgba(24, 24, 27, 0.04), transparent 55%),
+            linear-gradient(180deg, var(--bg0), var(--bg1));
 }
 
-/* Subtle grain overlay */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.06;
-    mix-blend-mode: multiply;
-    background-image:
-            repeating-linear-gradient(0deg, rgba(0,0,0,0.9) 0, rgba(0,0,0,0.9) 1px, transparent 1px, transparent 2px),
-            repeating-linear-gradient(90deg, rgba(0,0,0,0.9) 0, rgba(0,0,0,0.9) 1px, transparent 1px, transparent 2px);
-    transform: scale(1.1);
-}
-
-/* Default text rendering */
-* {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-    color: inherit;
-}
-
-/* Premium card feel without touching components */
-.shadow-soft {
-    box-shadow: var(--shadow2);
-}
-
-/* If your Card uses border classes, keep them subtle everywhere */
-.border {
-    border-color: var(--border);
-}
-
-/* Optional: nicer selection */
+/* Nice selection (small, but it matters) */
 ::selection {
-    background: rgba(17, 24, 39, 0.10);
+    background: rgba(17, 24, 39, 0.14);
 }
 
-/* ===== Markdown / prose helpers ===== */
-.prose-clean ul { list-style: disc; padding-left: 1.25rem; }
-.prose-clean ol { list-style: decimal; padding-left: 1.25rem; }
-.prose-clean li { margin: 0.25rem 0; }
-.prose-clean p { margin: 0.5rem 0; }
-.prose-clean a { text-decoration: underline; }
-
-/* Make prose blocks look more premium by default */
-.prose {
-    color: rgba(17, 24, 39, 0.90);
+/* Keep your existing custom prose helper, but make it cleaner */
+.prose-clean ul {
+    list-style: disc;
+    padding-left: 1.25rem;
 }
-
-.prose strong {
-    color: rgba(17, 24, 39, 0.95);
+.prose-clean ol {
+    list-style: decimal;
+    padding-left: 1.25rem;
 }
-
-.prose a {
-    text-decoration-thickness: 1px;
+.prose-clean li {
+    margin: 0.25rem 0;
+}
+.prose-clean p {
+    margin: 0.5rem 0;
+}
+.prose-clean a {
+    text-decoration: underline;
     text-underline-offset: 3px;
-    text-decoration-color: rgba(17, 24, 39, 0.35);
 }
 
-.prose ul > li::marker {
-    color: rgba(17, 24, 39, 0.45);
+/* Reusable shadow class (you already use "shadow-soft") */
+.shadow-soft {
+    box-shadow: var(--shadow);
 }
