@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Back to You — Admin</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+
+    <style>
+        .admin-wrap{padding:24px 0}
+        .admin-grid{display:grid;grid-template-columns:240px 1fr;gap:16px;align-items:start}
+        .admin-menu{position:sticky;top:84px;align-self:start}
+        .admin-menu .item{cursor:pointer;user-select:none}
+        .admin-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+        @media (max-width: 920px){
+            .admin-grid{grid-template-columns:1fr}
+            .admin-menu{position:relative;top:0;display:flex;gap:10px;overflow:auto;padding-bottom:10px}
+            .admin-menu .item{white-space:nowrap}
+        }
+
+        /* Cropper modal */
+        .crop-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(15,18,20,.55);padding:14px;z-index:9999}
+        .crop-panel{background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border:1px solid rgba(0,0,0,.08);border-radius:18px;box-shadow:0 30px 90px rgba(0,0,0,.25);padding:14px;max-width:600px;width:100%}
+        .crop-title{font-weight:700;margin-bottom:10px}
+        .crop-canvas{display:block;border-radius:16px;border:1px solid rgba(0,0,0,.12);margin:0 auto}
+        .crop-controls{margin-top:12px}
+        .crop-controls label{display:flex;gap:10px;align-items:center}
+        .crop-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
+    </style>
+</head>
+<body>
+<header class="topbar">
+    <div class="container topbar-inner">
+        <a class="brand" href="/admin/">
+            <div class="brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+                    <path d="M6 12c3-7 9-7 12 0" stroke="#1f2d33" stroke-width="1.7" stroke-linecap="round"/>
+                    <path d="M7 15c2.5-4.5 7.5-4.5 10 0" stroke="#1f2d33" stroke-width="1.7" stroke-linecap="round" opacity=".8"/>
+                </svg>
+            </div>
+            <div class="brand-title">
+                <strong>Back to You</strong>
+                <span>admin</span>
+            </div>
+        </a>
+
+        <div class="nav" style="display:flex; gap:10px; align-items:center;">
+            <label for="lang-top" style="font-size:12px; opacity:.75;">Editing</label>
+            <select id="lang-top" class="input" style="width:90px; padding:8px 10px;">
+                <option value="ru">RU</option>
+                <option value="en">EN</option>
+                <option value="el">EL</option>
+            </select>
+        </div>
+    </div>
+</header>
+
+<main class="admin-wrap">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <h2>Admin panel</h2>
+                <p class="sub">Edit texts, add/remove cards, upload photos. Saved to <code>content.json</code> on the server.</p>
+            </div>
+            <div class="admin-actions">
+                <button class="btn btn-success" id="btn-save">Save</button>
+                <button class="btn" id="btn-reload">Reload</button>
+                <button class="btn btn-danger" id="btn-logout">Logout</button>
+            </div>
+        </div>
+
+        <div class="admin-grid">
+            <aside class="admin-menu">
+                <div class="item active" data-tab="contacts">Contacts</div>
+                <div class="item" data-tab="hero">Hero</div>
+                <div class="item" data-tab="services">Services</div>
+                <div class="item" data-tab="about">About</div>
+                <div class="item" data-tab="process">Process</div>
+                <div class="item" data-tab="reviews">Reviews</div>
+                <div class="item" data-tab="faq">FAQ</div>
+            </aside>
+
+            <section class="card">
+                <div class="card-inner">
+                    <div class="admin-row" style="margin-bottom:10px;">
+                        <label class="note">Last loaded
+                            <input class="input" id="loaded-at" disabled />
+                        </label>
+                    </div>
+
+                    <div id="panel"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+
+<script src="/admin/admin.js"></script>
+</body>
+</html>
