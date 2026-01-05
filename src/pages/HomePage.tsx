@@ -62,35 +62,68 @@ function MarkdownBlock(props: { md: string }) {
   return <div className="prose max-w-none prose-zinc" dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-function ServiceCardView(props: { svc: ServiceCard }) {
-  const [open, setOpen] = useState(false);
-  const htmlShort = useMemo(() => mdToSafeHtml(props.svc.shortMd), [props.svc.shortMd]);
-  const htmlFull = useMemo(() => mdToSafeHtml(props.svc.fullMd), [props.svc.fullMd]);
+function ServiceCardView(props: { svc: ServiceCard; locale: Locale }) {
+    const [open, setOpen] = useState(false);
+    const htmlShort = useMemo(() => mdToSafeHtml(props.svc.shortMd), [props.svc.shortMd]);
+    const htmlFull = useMemo(() => mdToSafeHtml(props.svc.fullMd), [props.svc.fullMd]);
 
-  return (
-    <Card className="p-4 cursor-pointer" onClick={() => setOpen((v) => !v)}>
-      <div className="flex items-start gap-4">
-        {props.svc.imageUrl ? (
-          <img src={props.svc.imageUrl} alt="" className="w-16 h-16 rounded-xl object-cover border border-zinc-200" />
-        ) : (
-          <div className="w-16 h-16 rounded-xl bg-zinc-50 border border-zinc-200" />
-        )}
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-base font-semibold truncate">{props.svc.title}</div>
-            <div className="text-sm text-zinc-600 whitespace-nowrap">{props.svc.price}</div>
-          </div>
-          {!open ? (
-            <div className="text-sm text-zinc-700 mt-2 prose max-w-none prose-zinc" dangerouslySetInnerHTML={{ __html: htmlShort }} />
-          ) : (
-            <div className="text-sm text-zinc-700 mt-2 prose max-w-none prose-zinc" dangerouslySetInnerHTML={{ __html: htmlFull }} />
-          )}
+    function toggle() {
+        setOpen((v) => !v);
+    }
+
+    return (
+        <div
+            role="button"
+            tabIndex={0}
+            aria-expanded={open}
+            // FE: Make the whole card clickable (Card component may not forward onClick).
+            onClick={toggle}
+            onKeyDown={(e) => {
+                // FE: Accessibility: support Enter/Space.
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggle();
+                }
+            }}
+            className="outline-none"
+        >
+            <Card className="p-4 cursor-pointer select-none hover:shadow-soft focus-within:ring-2 focus-within:ring-zinc-300">
+            <div className="flex items-start gap-4">
+                    {props.svc.imageUrl ? (
+                        <img src={props.svc.imageUrl} alt="" className="w-16 h-16 rounded-xl object-cover border border-zinc-200" />
+                    ) : (
+                        <div className="w-16 h-16 rounded-xl bg-zinc-50 border border-zinc-200" />
+                    )}
+
+                    <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3">
+                            <div className="text-base font-semibold truncate">{props.svc.title}</div>
+                            <div className="text-sm text-zinc-600 whitespace-nowrap">{props.svc.price}</div>
+                        </div>
+
+                        {!open ? (
+                            <div
+                                className="text-sm text-zinc-700 mt-2 prose max-w-none prose-zinc"
+                                dangerouslySetInnerHTML={{ __html: htmlShort }}
+                            />
+                        ) : (
+                            <div
+                                className="text-sm text-zinc-700 mt-2 prose max-w-none prose-zinc"
+                                dangerouslySetInnerHTML={{ __html: htmlFull }}
+                            />
+                        )}
+
+                        <div className="text-xs text-zinc-400 mt-3 flex items-center gap-2">
+                            <span>{open ? t(props.locale, "collapse") : t(props.locale, "expand")}</span>
+                            <span aria-hidden="true">{open ? "▲" : "▼"}</span>
+                        </div>
+                    </div>
+                </div>
+            </Card>
         </div>
-      </div>
-      <div className="text-xs text-zinc-400 mt-3">{open ? "Click to collapse" : "Click to expand"}</div>
-    </Card>
-  );
+    );
 }
+
 
 export default function HomePage() {
   const params = useParams();
@@ -139,7 +172,7 @@ export default function HomePage() {
         <SectionTitle title={servicesBlock.title} subtitle={servicesBlock.subtitle} />
         <div className="grid md:grid-cols-2 gap-4">
           {model.services.map((s) => (
-            <ServiceCardView key={s.id} svc={s} />
+              <ServiceCardView key={s.id} svc={s} locale={locale} />
           ))}
         </div>
       </section>
