@@ -5,26 +5,311 @@ import type { ContentBundle, ContentModel, Locale, ServiceCard } from "../app/ty
 import { Card, Button, Input, Textarea, Label, Hint } from "../app/AppShell";
 import { mdToSafeHtml } from "../app/md";
 import { isLocale } from "../app/locale";
+import Cropper, { type Area } from "react-easy-crop";
+import { cropToDataUrl, fileToDataUrl } from "../app/image";
 
-/** FE: Simple Markdown editor with live preview. */
+/** FE: Simple Markdown editor with toolbar + live preview. */
 function MdEditor(props: { label: string; value: string; onChange: (v: string) => void; hint?: string; rows?: number }) {
   const html = useMemo(() => mdToSafeHtml(props.value), [props.value]);
+  const taRef = useRef<HTMLTextAreaElement | null>(null);
+
+  function applyEdit(edit: (current: string, selStart: number, selEnd: number) => { next: string; nextSelStart: number; nextSelEnd: number }) {
+    const el = taRef.current;
+    if (!el) return;
+
+    const { next, nextSelStart, nextSelEnd } = edit(props.value, el.selectionStart ?? 0, el.selectionEnd ?? 0);
+    props.onChange(next);
+
+    // FE: Restore selection after React updates the value.
+    requestAnimationFrame(() => {
+      const el2 = taRef.current;
+      if (!el2) return;
+      el2.focus();
+      el2.setSelectionRange(nextSelStart, nextSelEnd);
+    });
+  }
+
+  function wrap(left: string, right: string) {
+    applyEdit((current, s, e) => {
+      const before = current.slice(0, s);
+      const mid = current.slice(s, e);
+      const after = current.slice(e);
+
+      const next = before + left + (mid || "text") + right + after;
+
+      const selStart = s + left.length;
+      const selEnd = selStart + (mid || "text").length;
+      return { next, nextSelStart: selStart, nextSelEnd: selEnd };
+    });
+  }
+
+  function prefixLines(prefix: (i: number) => string) {
+    applyEdit((current, s, e) => {
+      const startLine = current.lastIndexOf("\n", Math.max(0, s - 1)) + 1;
+      const endLine = current.indexOf("\n", e);
+      const endPos = endLine === -1 ? current.length : endLine;
+
+      const before = current.slice(0, startLine);
+      const block = current.slice(startLine, endPos);
+      const after = current.slice(endPos);
+
+      const lines = block.split(/\n/);
+      const nextBlock = lines.map((ln, i) => (ln.trim().length ? prefix(i) + ln : ln)).join("\n");
+
+      const next = before + nextBlock + after;
+      const delta = nextBlock.length - block.length;
+
+      return { next, nextSelStart: s + (startLine <= s ? 0 : 0), nextSelEnd: e + delta };
+    });
+  }
+
+  function insertLink() {
+    applyEdit((current, s, e) => {
+      const before = current.slice(0, s);
+      const mid = current.slice(s, e) || "link text";
+      const after = current.slice(e);
+      const link = `[${mid}](https://example.com)`;
+      const next = before + link + after;
+
+      // FE: Select URL part for quick replace.
+      const urlStart = before.length + link.indexOf("https://");
+      const urlEnd = before.length + link.length - 1;
+      return { next, nextSelStart: urlStart, nextSelEnd: urlEnd };
+    });
+  }
+
+  const ToolBtn = (p: { children: React.ReactNode; onClick: () => void; title: string }) => (
+    <Button
+      type="button"
+      variant="ghost"
+      onClick={p.onClick}
+      title={p.title}
+      className="px-2 py-1 text-xs rounded-lg"
+    >
+      {p.children}
+    </Button>
+  );
+
   return (
     <div className="grid md:grid-cols-2 gap-3">
       <div>
-        <Label>{props.label}</Label>
-        {props.hint ? <Hint>{props.hint}</Hint> : null}
+        <div className="flex items-baseline justify-between gap-2">
+          <div>
+            <Label>{props.label}</Label>
+            {props.hint ? <Hint>{props.hint}</Hint> : null}
+          </div>
+          <div className="flex flex-wrap gap-1">
+            <ToolBtn title="Bold" onClick={() => wrap("**", "**")}>B</ToolBtn>
+            <ToolBtn title="Italic" onClick={() => wrap("*", "*")}>I</ToolBtn>
+            <ToolBtn title="H2" onClick={() => prefixLines(() => "## ")}>H2</ToolBtn>
+            <ToolBtn title="Bulleted list" onClick={() => prefixLines(() => "- ")}>•</ToolBtn>
+            <ToolBtn title="Numbered list" onClick={() => prefixLines((i) => `${i + 1}. `)}>1.</ToolBtn>
+            <ToolBtn title="Link" onClick={insertLink}>🔗</ToolBtn>
+          </div>
+        </div>
+
         <Textarea
+          ref={taRef}
           rows={props.rows ?? 10}
           value={props.value}
           onChange={(e) => props.onChange(e.target.value)}
-          className="mt-1"
+          className="mt-1 font-mono text-sm"
         />
+
+        <div className="mt-2 text-xs text-zinc-500">
+          Formatting: Markdown (supports **bold**, *italic*, lists, headings, links).
+        </div>
       </div>
+
       <div>
         <Label>Preview</Label>
-        <div className="mt-1 p-3 rounded-xl border border-zinc-200 bg-white prose max-w-none prose-zinc" dangerouslySetInnerHTML={{ __html: html }} />
+        <div
+          className="mt-1 p-3 rounded-xl border border-zinc-200 bg-white max-h-[420px] overflow-auto prose prose-clean max-w-none prose-zinc"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
       </div>
+    </div>
+  );
+}
+
+/** FE: Modal cropper to produce a resized (WebP/JPEG) data URL for static deployments. */
+function ImageCropModal(props: {
+  open: boolean;
+  imageSrc: string;
+  aspect: number;
+  title: string;
+  onCancel: () => void;
+  onSave: (dataUrl: string) => void;
+}) {
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [cropPixels, setCropPixels] = useState<Area | null>(null);
+  const [outWidth, setOutWidth] = useState(1400);
+  const [mimeType, setMimeType] = useState<"image/webp" | "image/jpeg">("image/webp");
+
+  if (!props.open) return null;
+
+  async function save() {
+    if (!cropPixels) return;
+    const dataUrl = await cropToDataUrl({
+      imageSrc: props.imageSrc,
+      cropPixels,
+      outWidth,
+      mimeType,
+      quality: mimeType === "image/webp" ? 0.86 : 0.9
+    });
+    props.onSave(dataUrl);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50" onClick={props.onCancel} />
+      <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-soft border border-zinc-200 overflow-hidden">
+        <div className="p-4 border-b border-zinc-200 flex items-center justify-between">
+          <div className="font-semibold">{props.title}</div>
+          <Button type="button" variant="ghost" onClick={props.onCancel}>Close</Button>
+        </div>
+
+        <div className="p-4 grid md:grid-cols-[1fr,280px] gap-4">
+          <div className="relative bg-zinc-100 rounded-2xl overflow-hidden min-h-[360px]">
+            <Cropper
+              image={props.imageSrc}
+              crop={crop}
+              zoom={zoom}
+              aspect={props.aspect}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={(_, area) => setCropPixels(area)}
+            />
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <Label>Zoom</Label>
+              <input
+                className="w-full"
+                type="range"
+                min={1}
+                max={3}
+                step={0.01}
+                value={zoom}
+                onChange={(e) => setZoom(Number(e.target.value))}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label>Output width</Label>
+                <select
+                  className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+                  value={outWidth}
+                  onChange={(e) => setOutWidth(Number(e.target.value))}
+                >
+                  <option value={900}>900px</option>
+                  <option value={1200}>1200px</option>
+                  <option value={1400}>1400px</option>
+                  <option value={1600}>1600px</option>
+                </select>
+                <div className="mt-1 text-xs text-zinc-500">Bigger = heavier JSON export.</div>
+              </div>
+              <div>
+                <Label>Format</Label>
+                <select
+                  className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+                  value={mimeType}
+                  onChange={(e) => setMimeType(e.target.value as any)}
+                >
+                  <option value="image/webp">WebP (recommended)</option>
+                  <option value="image/jpeg">JPEG</option>
+                </select>
+                <div className="mt-1 text-xs text-zinc-500">WebP usually smaller.</div>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <Button type="button" onClick={save} disabled={!cropPixels}>Use image</Button>
+              <Button type="button" variant="ghost" onClick={props.onCancel}>Cancel</Button>
+            </div>
+
+            <div className="text-xs text-zinc-500">
+              Tip: For a static site, images are stored as <code>data:</code> URLs inside <code>content.json</code>.
+              Keep them reasonably small.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** FE: Image input with upload + crop + preview, suitable for static exports. */
+function ImageField(props: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  aspect: number;
+  title: string;
+}) {
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const [cropOpen, setCropOpen] = useState(false);
+  const [src, setSrc] = useState<string>("");
+
+  async function onPickFile(file?: File) {
+    if (!file) return;
+    const dataUrl = await fileToDataUrl(file);
+    setSrc(dataUrl);
+    setCropOpen(true);
+  }
+
+  return (
+    <div>
+      <div className="flex items-baseline justify-between gap-2">
+        <Label>{props.label}</Label>
+        <div className="flex gap-2">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => void onPickFile(e.target.files?.[0])}
+          />
+          <Button type="button" variant="ghost" className="px-3 py-1.5 text-xs" onClick={() => fileRef.current?.click()}>
+            Upload…
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="px-3 py-1.5 text-xs"
+            onClick={() => props.onChange("")}
+            disabled={!props.value}
+            title="Remove image"
+          >
+            Clear
+          </Button>
+        </div>
+      </div>
+
+      <Input value={props.value} onChange={(e) => props.onChange(e.target.value)} className="mt-1" placeholder="Paste image URL or use Upload…" />
+
+      {props.value ? (
+        <div className="mt-2 rounded-2xl border border-zinc-200 bg-zinc-50 overflow-hidden">
+          <img src={props.value} alt="" className="w-full h-auto block" />
+        </div>
+      ) : (
+        <div className="mt-2 text-xs text-zinc-500">No image selected.</div>
+      )}
+
+      <ImageCropModal
+        open={cropOpen}
+        imageSrc={src}
+        aspect={props.aspect}
+        title={props.title}
+        onCancel={() => setCropOpen(false)}
+        onSave={(dataUrl) => {
+          props.onChange(dataUrl);
+          setCropOpen(false);
+        }}
+      />
     </div>
   );
 }
@@ -56,8 +341,13 @@ function ServiceEditor(props: {
           <Input value={props.svc.price} onChange={(e) => props.onChange({ price: e.target.value })} className="mt-1" />
         </div>
         <div>
-          <Label>Image URL</Label>
-          <Input value={props.svc.imageUrl ?? ""} onChange={(e) => props.onChange({ imageUrl: e.target.value })} className="mt-1" />
+          <ImageField
+            label="Image"
+            value={props.svc.imageUrl ?? ""}
+            onChange={(v) => props.onChange({ imageUrl: v })}
+            aspect={4 / 3}
+            title="Crop service image"
+          />
         </div>
       </div>
 
@@ -271,8 +561,13 @@ Full description…`,
             <Input value={blocks.hero.title} onChange={(e) => void patchHero({ title: e.target.value })} className="mt-1" />
           </div>
           <div>
-            <Label>Image URL</Label>
-            <Input value={blocks.hero.imageUrl ?? ""} onChange={(e) => void patchHero({ imageUrl: e.target.value })} className="mt-1" />
+            <ImageField
+              label="Hero image"
+              value={blocks.hero.imageUrl ?? ""}
+              onChange={(v) => void patchHero({ imageUrl: v })}
+              aspect={16 / 9}
+              title="Crop hero image"
+            />
           </div>
         </div>
 
