@@ -1,0 +1,64 @@
+{
+  "site": {
+    "brand": "Back to You",
+    "tagline": "Services that bring you back to yourself.",
+    "theme": {
+      "accent": "#f97316"
+    }
+  },
+  "blocks": {
+    "hero": {
+      "title": "Back to You",
+      "subtitle": "Simple, calm, effective. Because your time is not a hobby.",
+      "primaryCtaText": "Book a session",
+      "primaryCtaHref": "#services",
+      "secondaryCtaText": "Learn more",
+      "secondaryCtaHref": "#about",
+      "imageUrl": "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=1200&q=80"
+    },
+    "about": {
+      "title": "About",
+      "bodyMd": "We focus on practical support and clarity.\n\n- Clear steps\n- Friendly process\n- Results you can measure"
+    },
+    "services": {
+      "title": "Services",
+      "subtitle": "Click a card to expand and see full details."
+    },
+    "cta": {
+      "title": "Ready to start?",
+      "bodyMd": "Send a message and we’ll figure out the next step.\n\n- Fast reply\n- No pressure\n- Clear plan",
+      "buttonText": "Contact",
+      "buttonHref": "#footer"
+    },
+    "footer": {
+      "title": "Contact",
+      "bodyMd": "Email: **hello@backtoyou.local**\n\nInstagram: **@backtoyou**\n\nAddress: Athens (demo)"
+    }
+  },
+  "services": [
+    {
+      "id": "svc_1",
+      "title": "Consultation",
+      "shortMd": "A short session to define your goal and next steps.",
+      "fullMd": "## Consultation\n\nWe talk, we clarify, we set a plan.\n\n**Includes:**\n- goal definition\n- action steps\n- follow-up notes",
+      "price": "€50",
+      "imageUrl": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80"
+    },
+    {
+      "id": "svc_2",
+      "title": "Coaching Session",
+      "shortMd": "Deep work on one topic with concrete outcomes.",
+      "fullMd": "## Coaching Session\n\nLonger session with structure.\n\n- identify blocks\n- choose tools\n- leave with actions",
+      "price": "€90",
+      "imageUrl": "https://images.unsplash.com/photo-1521790797524-b2497295b8a0?auto=format&fit=crop&w=1200&q=80"
+    },
+    {
+      "id": "svc_3",
+      "title": "Package (4 sessions)",
+      "shortMd": "Best value if you want progress you can feel.",
+      "fullMd": "## Package (4 sessions)\n\nDesigned for momentum.\n\n**You get:**\n- weekly sessions\n- homework\n- progress tracking",
+      "price": "€320",
+      "imageUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"
+    }
+  ]
+}
