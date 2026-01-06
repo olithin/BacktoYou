@@ -26,7 +26,14 @@
         },
         "about": {
           "title": "About",
-          "bodyMd": "## About me\n\nThis is a safe space to understand what’s happening and what you truly need.  \nWe work calmly and clearly, with respect, confidentiality, and zero judgment.\n\n### How we work together\n\n- **Clear the mental “noise”.** We sort through thoughts, emotions, and patterns that drain you.\n- **Find what keeps you stuck.** Old experiences, fear, guilt, overload.\n- **Reset your inner compass.** So decisions feel clearer and steadier.\n- **Small steps, real change.** Practical actions that actually last.\n\n### What I can help with\n\n- stress, anxiety, burnout, overwhelm  \n- relationships and healthy boundaries  \n- self-esteem, inner confusion  \n- life transitions, crises, feeling “stuck”\n\n> The goal: more calm, more clarity, and a life that fits you.\n"
+          "bodyMd": "## About me\n\nThis is a safe space to understand what’s happening and what you truly need.  \nWe work calmly and clearly, with respect, confidentiality, and zero judgment.\n\n### How we work together\n\n- **Clear the mental “noise”.** We sort through thoughts, emotions, and patterns that drain you.\n- **Find what keeps you stuck.** Old experiences, fear, guilt, overload.\n- **Reset your inner compass.** So decisions feel clearer and steadier.\n- **Small steps, real change.** Practical actions that actually last.\n\n### What I can help with\n\n- stress, anxiety, burnout, overwhelm  \n- relationships and healthy boundaries  \n- self-esteem, inner confusion  \n- life transitions, crises, feeling “stuck”\n\n> The goal: more calm, more clarity, and a life that fits you.\n",
+          "media": {
+            "avatarUrls": [
+              "/uploads/avatar-1.webp",
+              "/uploads/avatar-2.webp",
+              "/uploads/avatar-3.webp"
+            ]
+          }
         },
         "services": {
           "title": "Services",
@@ -166,8 +173,8 @@
           "media": {
             "avatarUrls": [
               "/uploads/avatar-1.webp",
-              "",
-              ""
+              "/uploads/avatar-2.webp",
+              "/uploads/avatar-3.webp"
             ]
           }
         },

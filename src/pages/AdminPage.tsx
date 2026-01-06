@@ -438,6 +438,21 @@ export default function AdminPage() {
             .catch((e) => setErr(String(e?.message ? e.message : e)));
     }, [locale]);
 
+    // ========= Multi-locale helpers =========
+
+    const SUPPORTED_LOCALES: Locale[] = ["en", "ru", "el"];
+
+    function ensureLocale(b: ContentBundle, l: Locale): ContentModel {
+        // FE: Some locales might not exist yet in the bundle (common). Create them from default.
+        const existing = b.content[l];
+        if (existing) return existing;
+
+        const base = b.content[b.defaultLocale];
+        const clone = JSON.parse(JSON.stringify(base)) as ContentModel;
+        b.content[l] = clone;
+        return clone;
+    }
+
     // ========= Patch helpers =========
 
     function patchSite(patch: Partial<ContentModel["site"]>) {
@@ -461,23 +476,21 @@ export default function AdminPage() {
         });
     }
 
-    // FE: Shared image patcher (apply to all locales so user doesn't upload 3x).
+    // FE: Shared image patcher (apply to all locales, even if locale branch didn't exist yet).
     function patchHeroImageAllLocales(imageUrl: string) {
         mutateBundle((b) => {
-            const locales = Object.keys(b.content) as Locale[];
-            for (const l of locales) {
-                const m = b.content[l];
+            for (const l of SUPPORTED_LOCALES) {
+                const m = ensureLocale(b, l);
                 b.content[l] = { ...m, blocks: { ...m.blocks, hero: { ...m.blocks.hero, imageUrl } } };
             }
         });
     }
 
-    // FE: Shared about media patcher (apply to all locales so photos are global).
+    // FE: Shared about media patcher (apply to all locales, even if locale branch didn't exist yet).
     function patchAboutMediaAllLocales(patch: Partial<NonNullable<ContentModel["blocks"]["about"]["media"]>>) {
         mutateBundle((b) => {
-            const locales = Object.keys(b.content) as Locale[];
-            for (const l of locales) {
-                const m = b.content[l];
+            for (const l of SUPPORTED_LOCALES) {
+                const m = ensureLocale(b, l);
                 const current = m.blocks.about.media ?? {};
                 const nextMedia = { ...current, ...patch };
                 b.content[l] = { ...m, blocks: { ...m.blocks, about: { ...m.blocks.about, media: nextMedia } } };
