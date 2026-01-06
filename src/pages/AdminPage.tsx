@@ -346,7 +346,12 @@ function PublicUploadsImageField(props: {
     );
 }
 
-function ServiceEditor(props: { svc: ServiceCard; onChange: (patch: Partial<ServiceCard>) => void; onDelete: () => void }) {
+function ServiceEditor(props: {
+    svc: ServiceCard;
+    onChange: (patch: Partial<ServiceCard>) => void; // FE: title + md are per-locale
+    onDelete: () => void;
+    onSharedPatchAllLocales: (serviceId: string, patch: Partial<Pick<ServiceCard, "imageUrl" | "price">>) => void;
+}) {
     return (
         <Card className="p-5">
             <div className="flex items-start justify-between gap-4">
@@ -364,19 +369,31 @@ function ServiceEditor(props: { svc: ServiceCard; onChange: (patch: Partial<Serv
                     <Label>Title</Label>
                     <Input value={props.svc.title} onChange={(e) => props.onChange({ title: e.target.value })} className="mt-1" />
                 </div>
+
                 <div>
                     <Label>Price</Label>
-                    <Input value={props.svc.price} onChange={(e) => props.onChange({ price: e.target.value })} className="mt-1" />
+                    <Input
+                        value={props.svc.price}
+                        onChange={(e) => props.onSharedPatchAllLocales(props.svc.id, { price: e.target.value })}
+                        className="mt-1"
+                    />
+                    <div className="mt-1 text-xs text-zinc-500">Shared across languages.</div>
                 </div>
+
                 <div>
-                    {/* FE: Keeping per-locale behavior for service card images (safe, simplest). */}
                     <PublicUploadsImageField
                         label="Image"
                         value={props.svc.imageUrl ?? ""}
-                        onChange={(v) => props.onChange({ imageUrl: v })}
+                        onChange={(v) => props.onSharedPatchAllLocales(props.svc.id, { imageUrl: v })}
                         aspect={4 / 3}
                         title="Crop service image"
                         uploadFileName={`service-${props.svc.id}.webp`}
+                        hint={
+                            <>
+                                Shared across languages. Saved as <code>/uploads/service-{props.svc.id}.webp</code> (put file in{" "}
+                                <code>public/uploads</code>).
+                            </>
+                        }
                     />
                 </div>
             </div>
@@ -552,6 +569,33 @@ Full description…`,
         mutateBundle((b) => {
             const m = b.content[locale] ?? b.content[b.defaultLocale];
             b.content[locale] = { ...m, services: (m.services ?? []).filter((s) => s.id !== id) };
+        });
+    }
+
+    // FE: Shared service fields patcher (apply to all locales).
+    function patchServiceSharedAllLocales(serviceId: string, patch: Partial<Pick<ServiceCard, "imageUrl" | "price">>) {
+        mutateBundle((b) => {
+            // FE: If some locale misses this service ID, copy it from the current locale.
+            const sourceModel = b.content[locale] ?? b.content[b.defaultLocale];
+            const sourceSvc = (sourceModel.services ?? []).find((s) => s.id === serviceId);
+
+            for (const l of SUPPORTED_LOCALES) {
+                const m = ensureLocale(b, l);
+                const list = m.services ?? [];
+
+                const idx = list.findIndex((s) => s.id === serviceId);
+
+                let nextServices: ServiceCard[];
+                if (idx >= 0) {
+                    nextServices = list.map((s) => (s.id === serviceId ? { ...s, ...patch } : s));
+                } else if (sourceSvc) {
+                    nextServices = [{ ...sourceSvc, ...patch }, ...list];
+                } else {
+                    nextServices = list;
+                }
+
+                b.content[l] = { ...m, services: nextServices };
+            }
         });
     }
 
@@ -847,6 +891,7 @@ Full description…`,
                             svc={s}
                             onChange={(patch) => updateService(s.id, patch)}
                             onDelete={() => deleteService(s.id)}
+                            onSharedPatchAllLocales={patchServiceSharedAllLocales}
                         />
                     ))}
                 </div>
