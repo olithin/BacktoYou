@@ -26,20 +26,24 @@ export type ContentModel = {
             secondaryCtaHref: string;
             imageUrl?: string;
         };
-
-        // FE: About section supports 3 premium highlight lines (mini-cards on Home).
         about: {
             title: string;
             bodyMd: string;
-            highlights?: string[];
-        };
 
+            // NEW: optional “boutique” highlights + media assets
+            highlights?: string[];
+            media?: {
+                avatarUrls?: string[];   // length 3 recommended
+                diplomaUrl?: string;     // square image
+            };
+        };
         services: { title: string; subtitle: string };
         cta: { title: string; bodyMd: string; buttonText: string; buttonHref: string };
         footer: { title: string; bodyMd: string };
     };
     services: ServiceCard[];
 };
+
 
 export type ContentBundle = {
     defaultLocale: Locale;

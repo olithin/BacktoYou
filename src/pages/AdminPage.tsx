@@ -128,7 +128,17 @@ function MdEditor(props: { label: string; value: string; onChange: (v: string) =
     );
 }
 
-/** FE: Modal cropper to produce a resized (WebP/JPEG) data URL for static deployments. */
+/** FE: Download helper (for static sites: user saves into /public/uploads manually). */
+function downloadDataUrl(dataUrl: string, filename: string) {
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
+
+/** FE: Modal cropper to produce a resized data URL. */
 function ImageCropModal(props: {
     open: boolean;
     imageSrc: string;
@@ -140,7 +150,7 @@ function ImageCropModal(props: {
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [cropPixels, setCropPixels] = useState<Area | null>(null);
-    const [outWidth, setOutWidth] = useState(1400);
+    const [outWidth, setOutWidth] = useState(1200);
     const [mimeType, setMimeType] = useState<"image/webp" | "image/jpeg">("image/webp");
 
     if (!props.open) return null;
@@ -206,7 +216,7 @@ function ImageCropModal(props: {
                                     <option value={1400}>1400px</option>
                                     <option value={1600}>1600px</option>
                                 </select>
-                                <div className="mt-1 text-xs text-zinc-500">Bigger = heavier JSON export.</div>
+                                <div className="mt-1 text-xs text-zinc-500">Bigger = heavier export.</div>
                             </div>
                             <div>
                                 <Label>Format</Label>
@@ -228,7 +238,7 @@ function ImageCropModal(props: {
                         </div>
 
                         <div className="text-xs text-zinc-500">
-                            Tip: For a static site, images are stored as <code>data:</code> URLs inside <code>content.json</code>. Keep them reasonably small.
+                            For static: we’ll download the cropped file, you put it into <code>public/uploads</code>, and JSON will store <code>/uploads/...</code>.
                         </div>
                     </div>
                 </div>
@@ -237,8 +247,20 @@ function ImageCropModal(props: {
     );
 }
 
-/** FE: Image input with upload + crop + preview, suitable for static exports. */
-function ImageField(props: { label: string; value: string; onChange: (v: string) => void; aspect: number; title: string }) {
+/**
+ * FE: “Static upload” field:
+ * - Pick file, crop, download result as /public/uploads/<name>.webp
+ * - Save JSON value as /uploads/<name>.webp
+ */
+function PublicUploadsImageField(props: {
+    label: string;
+    value: string;
+    onChange: (v: string) => void;
+    aspect: number;
+    title: string;
+    uploadFileName: string; // e.g. "avatar-1.webp"
+    hint?: React.ReactNode;
+}) {
     const fileRef = useRef<HTMLInputElement | null>(null);
     const [cropOpen, setCropOpen] = useState(false);
     const [src, setSrc] = useState<string>("");
@@ -253,7 +275,18 @@ function ImageField(props: { label: string; value: string; onChange: (v: string)
     return (
         <div>
             <div className="flex items-baseline justify-between gap-2">
-                <Label>{props.label}</Label>
+                <div>
+                    <Label>{props.label}</Label>
+                    <Hint>
+                        {props.hint ? (
+                            props.hint
+                        ) : (
+                            <>
+                                Saved as <code>/uploads/{props.uploadFileName}</code> (put file in <code>public/uploads</code>).
+                            </>
+                        )}
+                    </Hint>
+                </div>
                 <div className="flex gap-2">
                     <input
                         ref={fileRef}
@@ -282,7 +315,7 @@ function ImageField(props: { label: string; value: string; onChange: (v: string)
                 value={props.value}
                 onChange={(e) => props.onChange(e.target.value)}
                 className="mt-1"
-                placeholder="Paste image URL or use Upload…"
+                placeholder={`/uploads/${props.uploadFileName}`}
             />
 
             {props.value ? (
@@ -300,7 +333,12 @@ function ImageField(props: { label: string; value: string; onChange: (v: string)
                 title={props.title}
                 onCancel={() => setCropOpen(false)}
                 onSave={(dataUrl) => {
-                    props.onChange(dataUrl);
+                    // FE: Download cropped result for /public/uploads
+                    downloadDataUrl(dataUrl, props.uploadFileName);
+
+                    // FE: Store stable public path in JSON
+                    props.onChange(`/uploads/${props.uploadFileName}`);
+
                     setCropOpen(false);
                 }}
             />
@@ -331,12 +369,14 @@ function ServiceEditor(props: { svc: ServiceCard; onChange: (patch: Partial<Serv
                     <Input value={props.svc.price} onChange={(e) => props.onChange({ price: e.target.value })} className="mt-1" />
                 </div>
                 <div>
-                    <ImageField
+                    {/* FE: Keeping per-locale behavior for service card images (safe, simplest). */}
+                    <PublicUploadsImageField
                         label="Image"
                         value={props.svc.imageUrl ?? ""}
                         onChange={(v) => props.onChange({ imageUrl: v })}
                         aspect={4 / 3}
                         title="Crop service image"
+                        uploadFileName={`service-${props.svc.id}.webp`}
                     />
                 </div>
             </div>
@@ -398,6 +438,8 @@ export default function AdminPage() {
             .catch((e) => setErr(String(e?.message ? e.message : e)));
     }, [locale]);
 
+    // ========= Patch helpers =========
+
     function patchSite(patch: Partial<ContentModel["site"]>) {
         mutateBundle((b) => {
             const m = b.content[locale] ?? b.content[b.defaultLocale];
@@ -416,6 +458,30 @@ export default function AdminPage() {
         mutateBundle((b) => {
             const m = b.content[locale] ?? b.content[b.defaultLocale];
             b.content[locale] = { ...m, blocks: { ...m.blocks, about: { ...m.blocks.about, ...patch } } };
+        });
+    }
+
+    // FE: Shared image patcher (apply to all locales so user doesn't upload 3x).
+    function patchHeroImageAllLocales(imageUrl: string) {
+        mutateBundle((b) => {
+            const locales = Object.keys(b.content) as Locale[];
+            for (const l of locales) {
+                const m = b.content[l];
+                b.content[l] = { ...m, blocks: { ...m.blocks, hero: { ...m.blocks.hero, imageUrl } } };
+            }
+        });
+    }
+
+    // FE: Shared about media patcher (apply to all locales so photos are global).
+    function patchAboutMediaAllLocales(patch: Partial<NonNullable<ContentModel["blocks"]["about"]["media"]>>) {
+        mutateBundle((b) => {
+            const locales = Object.keys(b.content) as Locale[];
+            for (const l of locales) {
+                const m = b.content[l];
+                const current = m.blocks.about.media ?? {};
+                const nextMedia = { ...current, ...patch };
+                b.content[l] = { ...m, blocks: { ...m.blocks, about: { ...m.blocks.about, media: nextMedia } } };
+            }
         });
     }
 
@@ -439,6 +505,8 @@ export default function AdminPage() {
             b.content[locale] = { ...m, blocks: { ...m.blocks, footer: { ...m.blocks.footer, ...patch } } };
         });
     }
+
+    // ========= Services =========
 
     function addService() {
         mutateBundle((b) => {
@@ -474,6 +542,8 @@ Full description…`,
         });
     }
 
+    // ========= Import/Export =========
+
     function exportBundle() {
         if (!bundle) return;
         const text = JSON.stringify(bundle, null, 2);
@@ -498,6 +568,8 @@ Full description…`,
         setModel(next.content[locale] ?? next.content[next.defaultLocale]);
     }
 
+    // ========= Render guards =========
+
     if (err) {
         return (
             <Card className="p-6">
@@ -517,6 +589,12 @@ Full description…`,
 
     const { site, blocks } = model;
 
+    const highlights = (blocks.about.highlights ?? ["", "", ""]).concat(["", "", ""]).slice(0, 3);
+
+    // FE: Read from current locale (values are shared via patchAboutMediaAllLocales).
+    const avatarUrls = (blocks.about.media?.avatarUrls ?? ["", "", ""]).concat(["", "", ""]).slice(0, 3);
+    const diplomaUrl = blocks.about.media?.diplomaUrl ?? "";
+
     return (
         <div className="space-y-6">
             <Card className="p-6">
@@ -535,7 +613,9 @@ Full description…`,
                                 to={`/${l}/admin`}
                                 className={
                                     "px-2 py-1 rounded border text-xs " +
-                                    (l === locale ? "bg-zinc-900 text-white border-zinc-900" : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50")
+                                    (l === locale
+                                        ? "bg-zinc-900 text-white border-zinc-900"
+                                        : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50")
                                 }
                             >
                                 {l.toUpperCase()}
@@ -563,7 +643,7 @@ Full description…`,
                 </div>
 
                 <div className="text-xs text-zinc-500 mt-3">
-                    Cloudflare Pages flow: edit → Export JSON → replace <code>public/content.json</code> in repo → deploy.
+                    Flow: edit → Export JSON → replace <code>public/content.json</code> in repo → deploy.
                 </div>
             </Card>
 
@@ -591,12 +671,18 @@ Full description…`,
                         <Input value={blocks.hero.title} onChange={(e) => patchHero({ title: e.target.value })} className="mt-1" />
                     </div>
                     <div>
-                        <ImageField
+                        <PublicUploadsImageField
                             label="Hero image"
                             value={blocks.hero.imageUrl ?? ""}
-                            onChange={(v) => patchHero({ imageUrl: v })}
+                            onChange={(v) => patchHeroImageAllLocales(v)}
                             aspect={16 / 9}
                             title="Crop hero image"
+                            uploadFileName="hero.webp"
+                            hint={
+                                <>
+                                    Shared across languages. Saved as <code>/uploads/hero.webp</code> (put file in <code>public/uploads</code>).
+                                </>
+                            }
                         />
                     </div>
                 </div>
@@ -634,29 +720,87 @@ Full description…`,
                     <Input value={blocks.about.title} onChange={(e) => patchAbout({ title: e.target.value })} className="mt-1" />
                 </div>
 
-                {/* FE: Premium highlights under About title (3 short lines). */}
                 <div>
                     <Label>Highlights (3 short lines)</Label>
-                    <Hint>Shown as mini-cards under About on the website.</Hint>
+                    <Hint>Shown as small “boutique” highlights.</Hint>
 
                     <div className="grid md:grid-cols-3 gap-3 mt-2">
-                        {[0, 1, 2].map((i) => {
-                            const current = blocks.about.highlights ?? ["", "", ""];
-                            return (
-                                <div key={i}>
-                                    <Label>{`Highlight ${i + 1}`}</Label>
-                                    <Input
-                                        className="mt-1"
-                                        value={current[i] ?? ""}
-                                        onChange={(e) => {
-                                            const next = [...current];
-                                            next[i] = e.target.value;
-                                            patchAbout({ highlights: next });
-                                        }}
-                                    />
-                                </div>
-                            );
-                        })}
+                        {[0, 1, 2].map((i) => (
+                            <div key={i}>
+                                <Label>{`Highlight ${i + 1}`}</Label>
+                                <Input
+                                    className="mt-1"
+                                    value={highlights[i] ?? ""}
+                                    onChange={(e) => {
+                                        const next = [...highlights];
+                                        next[i] = e.target.value;
+                                        patchAbout({ highlights: next });
+                                    }}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* NEW: About media editor */}
+                <div className="pt-2">
+                    <div className="text-sm font-semibold text-zinc-900">About media (3 circles + diploma)</div>
+                    <div className="text-xs text-zinc-500 mt-1">
+                        Upload → crop → file downloads → put it into <code>public/uploads</code> → JSON stores <code>/uploads/...</code>.
+                        <span className="ml-2 font-medium text-zinc-700">Shared across languages.</span>
+                    </div>
+
+                    <div className="grid lg:grid-cols-2 gap-4 mt-4">
+                        <Card className="p-5">
+                            <div className="font-semibold">Circle photos</div>
+                            <div className="text-xs text-zinc-500 mt-1">Aspect 1:1, rendered as circles on the Home page.</div>
+
+                            <div className="grid md:grid-cols-3 gap-3 mt-4">
+                                {[0, 1, 2].map((i) => (
+                                    <div key={i}>
+                                        <PublicUploadsImageField
+                                            label={`Avatar ${i + 1}`}
+                                            value={avatarUrls[i] ?? ""}
+                                            onChange={(v) => {
+                                                const next = [...avatarUrls];
+                                                next[i] = v;
+                                                patchAboutMediaAllLocales({ avatarUrls: next });
+                                            }}
+                                            aspect={1}
+                                            title={`Crop avatar ${i + 1}`}
+                                            uploadFileName={`avatar-${i + 1}.webp`}
+                                            hint={
+                                                <>
+                                                    Shared across languages. Saved as <code>/uploads/avatar-{i + 1}.webp</code> (put file in{" "}
+                                                    <code>public/uploads</code>).
+                                                </>
+                                            }
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </Card>
+
+                        <Card className="p-5">
+                            <div className="font-semibold">Diploma</div>
+                            <div className="text-xs text-zinc-500 mt-1">Square image (1:1). Looks best as clean document/photo.</div>
+
+                            <div className="mt-4">
+                                <PublicUploadsImageField
+                                    label="Diploma image"
+                                    value={diplomaUrl}
+                                    onChange={(v) => patchAboutMediaAllLocales({ diplomaUrl: v })}
+                                    aspect={1}
+                                    title="Crop diploma"
+                                    uploadFileName="diploma.webp"
+                                    hint={
+                                        <>
+                                            Shared across languages. Saved as <code>/uploads/diploma.webp</code> (put file in <code>public/uploads</code>).
+                                        </>
+                                    }
+                                />
+                            </div>
+                        </Card>
                     </div>
                 </div>
 
@@ -685,7 +829,12 @@ Full description…`,
 
                 <div className="space-y-4">
                     {model.services.map((s) => (
-                        <ServiceEditor key={s.id} svc={s} onChange={(patch) => updateService(s.id, patch)} onDelete={() => deleteService(s.id)} />
+                        <ServiceEditor
+                            key={s.id}
+                            svc={s}
+                            onChange={(patch) => updateService(s.id, patch)}
+                            onDelete={() => deleteService(s.id)}
+                        />
                     ))}
                 </div>
             </Card>
