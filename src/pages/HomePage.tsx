@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Api } from "../app/api";
 import type { ContentModel, Locale, ServiceCard } from "../app/types";
@@ -209,12 +209,7 @@ function Lightbox(props: { open: boolean; src: string; title?: string; onClose: 
     );
 }
 
-function AboutMedia(props: {
-    locale: Locale;
-    avatarUrls: string[];
-    diplomaUrl: string;
-    onOpen: (src: string, title?: string) => void;
-}) {
+function AboutMedia(props: { locale: Locale; avatarUrls: string[]; diplomaUrl: string; onOpen: (src: string, title?: string) => void }) {
     const copy: Record<Locale, { photos: string; diploma: string; note: string }> = {
         en: { photos: "Photos", diploma: "Diploma", note: "Tap to zoom" },
         ru: { photos: "Фото", diploma: "Диплом", note: "Нажмите, чтобы увеличить" },
@@ -226,7 +221,6 @@ function AboutMedia(props: {
 
     return (
         <div className="mb-6">
-            {/* FE: Local animation (no global CSS edits required). */}
             <style>{`
                 @keyframes vvFloat {
                     0% { transform: translateY(0px); }
@@ -248,13 +242,10 @@ function AboutMedia(props: {
             </div>
 
             <div className="mt-4 flex flex-col sm:flex-row gap-4">
-                {/* Avatars */}
                 <div className="flex items-center gap-4">
                     {[0, 1, 2].map((i) => {
                         const src = avatars[i];
                         const empty = !src;
-
-                        // FE: Tiny stagger so they don't float in sync.
                         const delayMs = i * 120;
 
                         return (
@@ -278,22 +269,15 @@ function AboutMedia(props: {
                                 disabled={!src}
                             >
                                 {src ? (
-                                    <img
-                                        src={src}
-                                        alt=""
-                                        className="w-full h-full object-cover transition duration-300 group-hover:scale-[1.05]"
-                                    />
+                                    <img src={src} alt="" className="w-full h-full object-cover transition duration-300 group-hover:scale-[1.05]" />
                                 ) : null}
 
-                                {/* FE: Boutique ring on hover */}
                                 <span className="pointer-events-none absolute inset-0 rounded-full ring-0 ring-[var(--ring)] transition group-hover:ring-4" />
 
-                                {/* FE: Shine sweep */}
                                 <span className="pointer-events-none absolute inset-0 opacity-[0.42]">
                                     <span className="absolute -top-8 left-1/4 h-14 w-36 rotate-12 bg-gradient-to-r from-white/0 via-white/60 to-white/0 blur-xl transition duration-300 group-hover:opacity-[0.7]" />
                                 </span>
 
-                                {/* FE: small hint chip */}
                                 {!empty ? (
                                     <span className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2">
                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/70 backdrop-blur border border-black/10 text-zinc-700">
@@ -306,7 +290,6 @@ function AboutMedia(props: {
                     })}
                 </div>
 
-                {/* Diploma */}
                 <div className="flex-1">
                     <div className="rounded-2xl border border-black/10 bg-white/55 p-3 flex items-center gap-4">
                         <div className="text-sm">
@@ -334,6 +317,117 @@ function AboutMedia(props: {
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    );
+}
+
+// ======= UX: reveal + skeleton (lightweight) =======
+
+function useReducedMotion() {
+    const reduced = useMemo(() => {
+        if (typeof window === "undefined") return false;
+        return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+    }, []);
+    return reduced;
+}
+
+function Reveal(props: { children: React.ReactNode; className?: string }) {
+    const ref = useRef<HTMLDivElement | null>(null);
+    const [seen, setSeen] = useState(false);
+    const reduce = useReducedMotion();
+
+    useEffect(() => {
+        const el = ref.current;
+        if (!el || seen || reduce) return;
+
+        const io = new IntersectionObserver(
+            (entries) => {
+                const e = entries[0];
+                if (e?.isIntersecting) {
+                    setSeen(true);
+                    io.disconnect();
+                }
+            },
+            { threshold: 0.12 }
+        );
+
+        io.observe(el);
+        return () => io.disconnect();
+    }, [seen, reduce]);
+
+    const cls =
+        "transition-all duration-500 ease-out will-change-transform " +
+        (props.className ? props.className + " " : "") +
+        (reduce ? "opacity-100 translate-y-0" : seen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3");
+
+    return (
+        <div ref={ref} className={cls}>
+            {props.children}
+        </div>
+    );
+}
+
+function SkeletonLine(props: { w?: string }) {
+    return <div className={"h-3 rounded-full bg-zinc-200/70 animate-pulse " + (props.w ?? "w-full")} />;
+}
+
+function SkeletonCard() {
+    return (
+        <Card className="p-7 md:p-8">
+            <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-zinc-200/70 animate-pulse" />
+                <div className="flex-1 space-y-2">
+                    <SkeletonLine w="w-2/3" />
+                    <SkeletonLine w="w-1/3" />
+                </div>
+            </div>
+            <div className="mt-6 space-y-3">
+                <SkeletonLine />
+                <SkeletonLine w="w-11/12" />
+                <SkeletonLine w="w-10/12" />
+                <SkeletonLine w="w-9/12" />
+            </div>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+                <div className="h-10 rounded-xl bg-zinc-200/70 animate-pulse" />
+                <div className="h-10 rounded-xl bg-zinc-200/70 animate-pulse" />
+            </div>
+        </Card>
+    );
+}
+
+function HomeSkeleton() {
+    return (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
+            <SkeletonCard />
+            <div className="grid lg:grid-cols-[1.35fr,0.65fr] gap-5 items-start">
+                <SkeletonCard />
+                <div className="space-y-5">
+                    <Card className="p-6">
+                        <SkeletonLine w="w-1/3" />
+                        <div className="mt-4 space-y-2">
+                            <SkeletonLine />
+                            <SkeletonLine w="w-10/12" />
+                            <SkeletonLine w="w-9/12" />
+                        </div>
+                    </Card>
+                    <Card className="p-6">
+                        <SkeletonLine w="w-1/2" />
+                        <div className="mt-4 space-y-2">
+                            <SkeletonLine />
+                            <SkeletonLine w="w-11/12" />
+                            <SkeletonLine w="w-8/12" />
+                        </div>
+                    </Card>
+                </div>
+            </div>
+            <div className="grid md:grid-cols-2 gap-5">
+                <Card className="p-5">
+                    <div className="h-24 rounded-2xl bg-zinc-200/70 animate-pulse" />
+                </Card>
+                <Card className="p-5">
+                    <div className="h-24 rounded-2xl bg-zinc-200/70 animate-pulse" />
+                </Card>
             </div>
         </div>
     );
@@ -421,11 +515,7 @@ export default function HomePage() {
     }
 
     if (!model) {
-        return (
-            <Card className="p-6">
-                <div className="text-zinc-600">{t(locale, "loading")}</div>
-            </Card>
-        );
+        return <HomeSkeleton />;
     }
 
     const { about, services: servicesBlock, cta, footer } = model.blocks;
@@ -435,55 +525,65 @@ export default function HomePage() {
 
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
-            <Hero model={model} />
+            <Reveal>
+                <Hero model={model} />
+            </Reveal>
 
-            <section id="about">
-                <SectionTitle title={about.title} />
+            <Reveal>
+                <section id="about">
+                    <SectionTitle title={about.title} />
 
-                <div className="grid lg:grid-cols-[1.35fr,0.65fr] gap-5 items-start">
-                    <Card className="p-7 md:p-8">
-                        <AboutMedia
-                            locale={locale}
-                            avatarUrls={avatarUrls}
-                            diplomaUrl={diplomaUrl}
-                            onOpen={(src, title) => setLightbox({ open: true, src, title })}
-                        />
-                        <MarkdownBlock md={about.bodyMd} />
+                    <div className="grid lg:grid-cols-[1.35fr,0.65fr] gap-5 items-start">
+                        <Card className="p-7 md:p-8">
+                            <AboutMedia
+                                locale={locale}
+                                avatarUrls={avatarUrls}
+                                diplomaUrl={diplomaUrl}
+                                onOpen={(src, title) => setLightbox({ open: true, src, title })}
+                            />
+                            <MarkdownBlock md={about.bodyMd} />
+                        </Card>
+
+                        <div className="space-y-5">
+                            <AboutSideCard locale={locale} />
+                            <SessionFlowCard locale={locale} />
+                        </div>
+                    </div>
+                </section>
+            </Reveal>
+
+            <Reveal>
+                <section id="services">
+                    <SectionTitle title={servicesBlock.title} subtitle={servicesBlock.subtitle} />
+                    <div className="grid md:grid-cols-2 gap-5">
+                        {model.services.map((s) => (
+                            <ServiceCardView key={s.id} svc={s} locale={locale} />
+                        ))}
+                    </div>
+                </section>
+            </Reveal>
+
+            <Reveal>
+                <section id="cta">
+                    <SectionTitle title={cta.title} />
+                    <Card className="p-7 md:p-8 grid md:grid-cols-2 gap-6 items-start">
+                        <MarkdownBlock md={cta.bodyMd} />
+                        <div className="flex md:justify-end">
+                            <Button onClick={() => (window.location.href = cta.buttonHref)}>{cta.buttonText}</Button>
+                        </div>
                     </Card>
+                </section>
+            </Reveal>
 
-                    <div className="space-y-5">
-                        <AboutSideCard locale={locale} />
-                        <SessionFlowCard locale={locale} />
-                    </div>
-                </div>
-            </section>
-
-            <section id="services">
-                <SectionTitle title={servicesBlock.title} subtitle={servicesBlock.subtitle} />
-                <div className="grid md:grid-cols-2 gap-5">
-                    {model.services.map((s) => (
-                        <ServiceCardView key={s.id} svc={s} locale={locale} />
-                    ))}
-                </div>
-            </section>
-
-            <section id="cta">
-                <SectionTitle title={cta.title} />
-                <Card className="p-7 md:p-8 grid md:grid-cols-2 gap-6 items-start">
-                    <MarkdownBlock md={cta.bodyMd} />
-                    <div className="flex md:justify-end">
-                        <Button onClick={() => (window.location.href = cta.buttonHref)}>{cta.buttonText}</Button>
-                    </div>
-                </Card>
-            </section>
-
-            <section id="footer">
-                <SectionTitle title={footer.title} />
-                <Card className="p-7 md:p-8">
-                    <MarkdownBlock md={footer.bodyMd} />
-                    <div className="text-xs text-zinc-600 mt-5">{t(locale, "localNote")}</div>
-                </Card>
-            </section>
+            <Reveal>
+                <section id="footer">
+                    <SectionTitle title={footer.title} />
+                    <Card className="p-7 md:p-8">
+                        <MarkdownBlock md={footer.bodyMd} />
+                        <div className="text-xs text-zinc-600 mt-5">{t(locale, "localNote")}</div>
+                    </Card>
+                </section>
+            </Reveal>
 
             <Lightbox open={lightbox.open} src={lightbox.src} title={lightbox.title} onClose={() => setLightbox({ open: false, src: "" })} />
         </div>
