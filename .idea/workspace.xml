@@ -60,7 +60,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1767644642998</updated>
-      <workItem from="1767644644109" duration="22925000" />
+      <workItem from="1767644644109" duration="23707000" />
     </task>
     <task id="LOCAL-00001" summary="fix project">
       <option name="closed" value="true" />
@@ -190,7 +190,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767665878090</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="button changes">
+      <option name="closed" value="true" />
+      <created>1767669111989</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1767669111989</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -215,7 +223,8 @@
     <MESSAGE value="added diplom" />
     <MESSAGE value="added phone" />
     <MESSAGE value="added color" />
-    <option name="LAST_COMMIT_MESSAGE" value="added color" />
+    <MESSAGE value="button changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="button changes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
