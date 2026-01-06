@@ -32,7 +32,8 @@
               "/uploads/avatar-1.webp",
               "/uploads/avatar-2.webp",
               "/uploads/avatar-3.webp"
-            ]
+            ],
+            "diplomaUrl": "/uploads/diploma.webp"
           }
         },
         "services": {
@@ -175,7 +176,8 @@
               "/uploads/avatar-1.webp",
               "/uploads/avatar-2.webp",
               "/uploads/avatar-3.webp"
-            ]
+            ],
+            "diplomaUrl": "/uploads/diploma.webp"
           }
         },
         "services": {
