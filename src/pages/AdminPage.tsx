@@ -652,6 +652,7 @@ export default function AdminPage() {
             const id = crypto.randomUUID().slice(0, 10);
 
             // FE: Add the same service id into ALL locales so lists never drift.
+            // FE: Add to the END of the list.
             for (const l of SUPPORTED_LOCALES) {
                 const m = ensureLocale(b, l);
 
@@ -670,7 +671,7 @@ Full description…`
                     imageUrl: "",
                 };
 
-                b.content[l] = { ...m, services: [svc, ...(m.services ?? [])] };
+                b.content[l] = { ...m, services: [...(m.services ?? []), svc] };
             }
 
             normalizeServicesAcrossLocales(b);
@@ -763,7 +764,7 @@ Full description…`
 
         const a = document.createElement("a");
         a.href = url;
-        a.download = "content.json";
+        a.download = "content.bundle.json";
         a.click();
 
         URL.revokeObjectURL(url);
