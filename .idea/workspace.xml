@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="d6d0b432-56d5-45c0-ab0c-b4f8773b302c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/public/content.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/content.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AdminPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AdminPage.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +61,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1767644642998</updated>
-      <workItem from="1767644644109" duration="27157000" />
+      <workItem from="1767644644109" duration="29403000" />
     </task>
     <task id="LOCAL-00001" summary="fix project">
       <option name="closed" value="true" />
@@ -214,7 +215,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767707510492</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="adde card 2">
+      <option name="closed" value="true" />
+      <created>1767708948770</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1767708948770</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -242,7 +251,8 @@
     <MESSAGE value="button changes" />
     <MESSAGE value="added background" />
     <MESSAGE value="consultation added" />
-    <option name="LAST_COMMIT_MESSAGE" value="consultation added" />
+    <MESSAGE value="adde card 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="adde card 2" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

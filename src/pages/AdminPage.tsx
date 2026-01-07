@@ -95,12 +95,24 @@ function MdEditor(props: { label: string; value: string; onChange: (v: string) =
                         {props.hint ? <Hint>{props.hint}</Hint> : null}
                     </div>
                     <div className="flex flex-wrap gap-1">
-                        <ToolBtn title="Bold" onClick={() => wrap("**", "**")}>B</ToolBtn>
-                        <ToolBtn title="Italic" onClick={() => wrap("*", "*")}>I</ToolBtn>
-                        <ToolBtn title="H2" onClick={() => prefixLines(() => "## ")}>H2</ToolBtn>
-                        <ToolBtn title="Bulleted list" onClick={() => prefixLines(() => "- ")}>•</ToolBtn>
-                        <ToolBtn title="Numbered list" onClick={() => prefixLines((i) => `${i + 1}. `)}>1.</ToolBtn>
-                        <ToolBtn title="Link" onClick={insertLink}>🔗</ToolBtn>
+                        <ToolBtn title="Bold" onClick={() => wrap("**", "**")}>
+                            B
+                        </ToolBtn>
+                        <ToolBtn title="Italic" onClick={() => wrap("*", "*")}>
+                            I
+                        </ToolBtn>
+                        <ToolBtn title="H2" onClick={() => prefixLines(() => "## ")}>
+                            H2
+                        </ToolBtn>
+                        <ToolBtn title="Bulleted list" onClick={() => prefixLines(() => "- ")}>
+                            •
+                        </ToolBtn>
+                        <ToolBtn title="Numbered list" onClick={() => prefixLines((i) => `${i + 1}. `)}>
+                            1.
+                        </ToolBtn>
+                        <ToolBtn title="Link" onClick={insertLink}>
+                            🔗
+                        </ToolBtn>
                     </div>
                 </div>
 
@@ -112,9 +124,7 @@ function MdEditor(props: { label: string; value: string; onChange: (v: string) =
                     className="mt-1 font-mono text-sm"
                 />
 
-                <div className="mt-2 text-xs text-zinc-500">
-                    Formatting: Markdown (supports **bold**, *italic*, lists, headings, links).
-                </div>
+                <div className="mt-2 text-xs text-zinc-500">Formatting: Markdown (supports **bold**, *italic*, lists, headings, links).</div>
             </div>
 
             <div>
@@ -173,7 +183,9 @@ function ImageCropModal(props: {
             <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-soft border border-zinc-200 overflow-hidden">
                 <div className="p-4 border-b border-zinc-200 flex items-center justify-between">
                     <div className="font-semibold">{props.title}</div>
-                    <Button type="button" variant="ghost" onClick={props.onCancel}>Close</Button>
+                    <Button type="button" variant="ghost" onClick={props.onCancel}>
+                        Close
+                    </Button>
                 </div>
 
                 <div className="p-4 grid md:grid-cols-[1fr,280px] gap-4">
@@ -233,12 +245,17 @@ function ImageCropModal(props: {
                         </div>
 
                         <div className="flex gap-2 pt-2">
-                            <Button type="button" onClick={save} disabled={!cropPixels}>Use image</Button>
-                            <Button type="button" variant="ghost" onClick={props.onCancel}>Cancel</Button>
+                            <Button type="button" onClick={save} disabled={!cropPixels}>
+                                Use image
+                            </Button>
+                            <Button type="button" variant="ghost" onClick={props.onCancel}>
+                                Cancel
+                            </Button>
                         </div>
 
                         <div className="text-xs text-zinc-500">
-                            For static: we’ll download the cropped file, you put it into <code>public/uploads</code>, and JSON will store <code>/uploads/...</code>.
+                            For static: we’ll download the cropped file, you put it into <code>public/uploads</code>, and JSON will store{" "}
+                            <code>/uploads/...</code>.
                         </div>
                     </div>
                 </div>
@@ -311,12 +328,7 @@ function PublicUploadsImageField(props: {
                 </div>
             </div>
 
-            <Input
-                value={props.value}
-                onChange={(e) => props.onChange(e.target.value)}
-                className="mt-1"
-                placeholder={`/uploads/${props.uploadFileName}`}
-            />
+            <Input value={props.value} onChange={(e) => props.onChange(e.target.value)} className="mt-1" placeholder={`/uploads/${props.uploadFileName}`} />
 
             {props.value ? (
                 <div className="mt-2 rounded-2xl border border-zinc-200 bg-zinc-50 overflow-hidden">
@@ -351,6 +363,12 @@ function ServiceEditor(props: {
     onChange: (patch: Partial<ServiceCard>) => void; // FE: title + md are per-locale
     onDelete: () => void;
     onSharedPatchAllLocales: (serviceId: string, patch: Partial<Pick<ServiceCard, "imageUrl" | "price">>) => void;
+
+    // FE: Reorder (shared across locales)
+    canMoveUp: boolean;
+    canMoveDown: boolean;
+    onMoveUp: () => void;
+    onMoveDown: () => void;
 }) {
     return (
         <Card className="p-5">
@@ -359,9 +377,33 @@ function ServiceEditor(props: {
                     <div className="text-base font-semibold truncate">{props.svc.title || "Untitled service"}</div>
                     <div className="text-sm text-zinc-500 mt-1">ID: {props.svc.id}</div>
                 </div>
-                <Button variant="ghost" onClick={props.onDelete} className="text-red-700 border-red-200 hover:bg-red-50">
-                    Delete
-                </Button>
+
+                <div className="flex items-center gap-2">
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        className="px-2 py-1 text-xs rounded-lg"
+                        onClick={props.onMoveUp}
+                        disabled={!props.canMoveUp}
+                        title="Move up"
+                    >
+                        ▲
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        className="px-2 py-1 text-xs rounded-lg"
+                        onClick={props.onMoveDown}
+                        disabled={!props.canMoveDown}
+                        title="Move down"
+                    >
+                        ▼
+                    </Button>
+
+                    <Button variant="ghost" onClick={props.onDelete} className="text-red-700 border-red-200 hover:bg-red-50">
+                        Delete
+                    </Button>
+                </div>
             </div>
 
             <div className="grid md:grid-cols-3 gap-4 mt-5">
@@ -390,8 +432,7 @@ function ServiceEditor(props: {
                         uploadFileName={`service-${props.svc.id}.webp`}
                         hint={
                             <>
-                                Shared across languages. Saved as <code>/uploads/service-{props.svc.id}.webp</code> (put file in{" "}
-                                <code>public/uploads</code>).
+                                Shared across languages. Saved as <code>/uploads/service-{props.svc.id}.webp</code> (put file in <code>public/uploads</code>).
                             </>
                         }
                     />
@@ -446,15 +487,6 @@ export default function AdminPage() {
         });
     }
 
-    useEffect(() => {
-        Api.getBundle()
-            .then((b) => {
-                setBundle(b);
-                setModel(b.content[locale] ?? b.content[b.defaultLocale]);
-            })
-            .catch((e) => setErr(String(e?.message ? e.message : e)));
-    }, [locale]);
-
     // ========= Multi-locale helpers =========
 
     const SUPPORTED_LOCALES: Locale[] = ["en", "ru", "el"];
@@ -469,6 +501,83 @@ export default function AdminPage() {
         b.content[l] = clone;
         return clone;
     }
+
+    function normalizeServicesAcrossLocales(b: ContentBundle) {
+        // FE: Canonical order = defaultLocale services + any missing ids appended in first-seen order.
+        const masterLocale = b.defaultLocale as Locale;
+        const master = ensureLocale(b, masterLocale);
+
+        const pushUnique = (arr: string[], id: string) => {
+            if (!arr.includes(id)) arr.push(id);
+        };
+
+        const order: string[] = [];
+        for (const s of master.services ?? []) pushUnique(order, s.id);
+
+        // FE: Merge ids from other locales (if someone added services in RU/EL earlier).
+        for (const l of SUPPORTED_LOCALES) {
+            const m = ensureLocale(b, l);
+            for (const s of m.services ?? []) pushUnique(order, s.id);
+        }
+
+        // FE: Build a source map to clone missing services into locales that don't have them.
+        const byId = new Map<string, ServiceCard>();
+        for (const l of SUPPORTED_LOCALES) {
+            const m = ensureLocale(b, l);
+            for (const s of m.services ?? []) {
+                if (!byId.has(s.id)) byId.set(s.id, s);
+            }
+        }
+
+        // FE: Reorder each locale services to match canonical `order`.
+        for (const l of SUPPORTED_LOCALES) {
+            const m = ensureLocale(b, l);
+            const map = new Map((m.services ?? []).map((s) => [s.id, s] as const));
+
+            const next = order
+                .map((id) => map.get(id) ?? byId.get(id))
+                .filter(Boolean) as ServiceCard[];
+
+            b.content[l] = { ...m, services: next };
+        }
+    }
+
+    function applyServicesOrderAllLocales(b: ContentBundle, orderIds: string[]) {
+        // FE: Build a global source map so missing services can be cloned if needed.
+        const byId = new Map<string, ServiceCard>();
+        for (const l of SUPPORTED_LOCALES) {
+            const m = ensureLocale(b, l);
+            for (const s of m.services ?? []) {
+                if (!byId.has(s.id)) byId.set(s.id, s);
+            }
+        }
+
+        for (const l of SUPPORTED_LOCALES) {
+            const m = ensureLocale(b, l);
+            const map = new Map((m.services ?? []).map((s) => [s.id, s] as const));
+
+            const next = orderIds
+                .map((id) => map.get(id) ?? byId.get(id))
+                .filter(Boolean) as ServiceCard[];
+
+            b.content[l] = { ...m, services: next };
+        }
+    }
+
+    useEffect(() => {
+        Api.getBundle()
+            .then((b) => {
+                // FE: Normalize services across locales on load to fix "drift" in older content.
+                const next = JSON.parse(JSON.stringify(b)) as ContentBundle;
+                normalizeServicesAcrossLocales(next);
+
+                void Api.setBundle(next);
+                setBundle(next);
+                setModel(next.content[locale] ?? next.content[next.defaultLocale]);
+            })
+            .catch((e) => setErr(String(e?.message ? e.message : e)));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [locale]);
 
     // ========= Patch helpers =========
 
@@ -540,20 +649,31 @@ export default function AdminPage() {
 
     function addService() {
         mutateBundle((b) => {
-            const m = b.content[locale] ?? b.content[b.defaultLocale];
+            const id = crypto.randomUUID().slice(0, 10);
 
-            const svc: ServiceCard = {
-                id: crypto.randomUUID().slice(0, 10),
-                title: "New service",
-                price: "€0",
-                shortMd: "Short description…",
-                fullMd: `## New service
+            // FE: Add the same service id into ALL locales so lists never drift.
+            for (const l of SUPPORTED_LOCALES) {
+                const m = ensureLocale(b, l);
 
-Full description…`,
-                imageUrl: "",
-            };
+                const svc: ServiceCard = {
+                    id,
+                    // FE: Localized fields are per-locale. We prefill only for the current editor locale.
+                    title: l === locale ? "New service" : "",
+                    price: "€0",
+                    shortMd: l === locale ? "Short description…" : "",
+                    fullMd:
+                        l === locale
+                            ? `## New service
 
-            b.content[locale] = { ...m, services: [svc, ...(m.services ?? [])] };
+Full description…`
+                            : "",
+                    imageUrl: "",
+                };
+
+                b.content[l] = { ...m, services: [svc, ...(m.services ?? [])] };
+            }
+
+            normalizeServicesAcrossLocales(b);
         });
     }
 
@@ -562,13 +682,44 @@ Full description…`,
             const m = b.content[locale] ?? b.content[b.defaultLocale];
             const next = (m.services ?? []).map((s) => (s.id === id ? { ...s, ...patch, id } : s));
             b.content[locale] = { ...m, services: next };
+
+            // FE: Keep a stable order even after edits (some locales may still drift in older data).
+            normalizeServicesAcrossLocales(b);
         });
     }
 
     function deleteService(id: string) {
         mutateBundle((b) => {
-            const m = b.content[locale] ?? b.content[b.defaultLocale];
-            b.content[locale] = { ...m, services: (m.services ?? []).filter((s) => s.id !== id) };
+            // FE: Delete in ALL locales to avoid ghost cards in other languages.
+            for (const l of SUPPORTED_LOCALES) {
+                const m = ensureLocale(b, l);
+                b.content[l] = { ...m, services: (m.services ?? []).filter((s) => s.id !== id) };
+            }
+
+            normalizeServicesAcrossLocales(b);
+        });
+    }
+
+    function moveServiceAllLocales(serviceId: string, dir: -1 | 1) {
+        mutateBundle((b) => {
+            // FE: Start from a consistent state.
+            normalizeServicesAcrossLocales(b);
+
+            const masterLocale = b.defaultLocale as Locale;
+            const master = ensureLocale(b, masterLocale);
+
+            const ids = (master.services ?? []).map((s) => s.id);
+            const idx = ids.indexOf(serviceId);
+            if (idx < 0) return;
+
+            const nextIdx = idx + dir;
+            if (nextIdx < 0 || nextIdx >= ids.length) return;
+
+            // FE: Swap in canonical order.
+            [ids[idx], ids[nextIdx]] = [ids[nextIdx], ids[idx]];
+
+            // FE: Apply to all locales.
+            applyServicesOrderAllLocales(b, ids);
         });
     }
 
@@ -589,13 +740,16 @@ Full description…`,
                 if (idx >= 0) {
                     nextServices = list.map((s) => (s.id === serviceId ? { ...s, ...patch } : s));
                 } else if (sourceSvc) {
-                    nextServices = [{ ...sourceSvc, ...patch }, ...list];
+                    // FE: Append (not prepend) so we do not reorder lists unexpectedly.
+                    nextServices = [...list, { ...sourceSvc, ...patch }];
                 } else {
                     nextServices = list;
                 }
 
                 b.content[l] = { ...m, services: nextServices };
             }
+
+            normalizeServicesAcrossLocales(b);
         });
     }
 
@@ -609,7 +763,7 @@ Full description…`,
 
         const a = document.createElement("a");
         a.href = url;
-        a.download = "content.bundle.json";
+        a.download = "content.json";
         a.click();
 
         URL.revokeObjectURL(url);
@@ -618,6 +772,9 @@ Full description…`,
     async function importBundle(file: File) {
         const text = await file.text();
         const next = JSON.parse(text) as ContentBundle;
+
+        // FE: Normalize right away to fix older/broken ordering in imported content.
+        normalizeServicesAcrossLocales(next);
 
         // FE: Save and reflect immediately without refetch.
         await Api.setBundle(next);
@@ -760,11 +917,19 @@ Full description…`,
                     </div>
                     <div>
                         <Label>Secondary CTA Text</Label>
-                        <Input value={blocks.hero.secondaryCtaText} onChange={(e) => patchHero({ secondaryCtaText: e.target.value })} className="mt-1" />
+                        <Input
+                            value={blocks.hero.secondaryCtaText}
+                            onChange={(e) => patchHero({ secondaryCtaText: e.target.value })}
+                            className="mt-1"
+                        />
                     </div>
                     <div>
                         <Label>Secondary CTA Href</Label>
-                        <Input value={blocks.hero.secondaryCtaHref} onChange={(e) => patchHero({ secondaryCtaHref: e.target.value })} className="mt-1" />
+                        <Input
+                            value={blocks.hero.secondaryCtaHref}
+                            onChange={(e) => patchHero({ secondaryCtaHref: e.target.value })}
+                            className="mt-1"
+                        />
                     </div>
                 </div>
             </Card>
@@ -885,13 +1050,17 @@ Full description…`,
                 </div>
 
                 <div className="space-y-4">
-                    {model.services.map((s) => (
+                    {model.services.map((s, i) => (
                         <ServiceEditor
                             key={s.id}
                             svc={s}
                             onChange={(patch) => updateService(s.id, patch)}
                             onDelete={() => deleteService(s.id)}
                             onSharedPatchAllLocales={patchServiceSharedAllLocales}
+                            canMoveUp={i > 0}
+                            canMoveDown={i < model.services.length - 1}
+                            onMoveUp={() => moveServiceAllLocales(s.id, -1)}
+                            onMoveDown={() => moveServiceAllLocales(s.id, +1)}
                         />
                     ))}
                 </div>
