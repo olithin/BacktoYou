@@ -24,8 +24,8 @@ function json(res: unknown, init?: ResponseInit) {
     });
 }
 
-function badRequest(message: string) {
-    return json({ ok: false, error: "bad_request", message }, { status: 400 });
+function badRequest(message: string, extra?: Record<string, unknown>) {
+    return json({ ok: false, error: "bad_request", message, ...(extra ?? {}) }, { status: 400 });
 }
 
 function forbidden(reason: string, extra?: Record<string, unknown>) {
@@ -36,14 +36,14 @@ function methodNotAllowed() {
     return json({ ok: false, error: "method_not_allowed" }, { status: 405 });
 }
 
-function readAccessEmail(req: Request): string {
+function readAccessEmail(req: Request): { email: string; rawEmail: string } {
     // BE: Cloudflare Access injects this header after successful login.
     const raw =
         req.headers.get("Cf-Access-Authenticated-User-Email") ||
         req.headers.get("cf-access-authenticated-user-email") ||
         "";
 
-    return raw.toLowerCase().trim();
+    return { rawEmail: raw, email: raw.toLowerCase().trim() };
 }
 
 function readAllowedEmails(env: Env): string[] {
@@ -58,8 +58,11 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
     const { request, env } = ctx;
 
     if (request.method === "GET") {
+        // BE: If KV contains "" (empty string), treat it as missing.
         const raw = await env.KV.get(KEY);
-        if (!raw) return json({ ok: false, error: "not_found", message: "No content in KV yet" }, { status: 404 });
+        if (!raw || !raw.trim()) {
+            return json({ ok: false, error: "not_found", message: "No content in KV yet" }, { status: 404 });
+        }
 
         return new Response(raw, {
             headers: {
@@ -70,14 +73,25 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
     }
 
     if (request.method === "PUT") {
-        const email = readAccessEmail(request);
+        const { email, rawEmail } = readAccessEmail(request);
         const allowed = readAllowedEmails(env);
 
         // BE: Safety guard. If allowlist is empty, deny writes.
         if (allowed.length === 0) return forbidden("allowlist_empty");
 
-        if (!email) return forbidden("missing_access_email");
-        if (!allowed.includes(email)) return forbidden("not_in_allowlist", { email });
+        // BE: If Access isn't applied to this route, header will be missing.
+        if (!email) {
+            return forbidden("missing_access_email", {
+                hasAccessEmailHeader: !!rawEmail,
+            });
+        }
+
+        if (!allowed.includes(email)) {
+            return forbidden("not_in_allowlist", {
+                email,
+                allowedCount: allowed.length,
+            });
+        }
 
         let obj: unknown;
         try {
@@ -91,7 +105,10 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
         if (!anyObj || typeof anyObj !== "object") return badRequest("Body must be an object");
         if (!anyObj.content || typeof anyObj.content !== "object") return badRequest("Missing 'content' object");
 
+        // BE: Prevent accidentally writing empty payloads (a common “oops I broke prod” move).
         const raw = JSON.stringify(obj, null, 2);
+        if (!raw.trim() || raw.trim() === "null") return badRequest("Empty body");
+
         await env.KV.put(KEY, raw);
 
         return json({ ok: true });
