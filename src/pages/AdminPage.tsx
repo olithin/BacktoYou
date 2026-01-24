@@ -8,7 +8,7 @@ import { isLocale } from "../app/locale";
 import Cropper, { type Area } from "react-easy-crop";
 import { cropToDataUrl, fileToDataUrl } from "../app/image";
 
-type SetBundleResult = { ok: true } | { ok: false; reason: string };
+type SetBundleResult = { ok: true } | { ok: false; reason: string; status?: number; details?: unknown };
 
 /** FE: Simple Markdown editor with toolbar + live preview. */
 function MdEditor(props: { label: string; value: string; onChange: (v: string) => void; hint?: string; rows?: number }) {
@@ -453,6 +453,21 @@ function ServiceEditor(props: {
     );
 }
 
+function humanizeSaveReason(reason: string) {
+    if (!reason) return "Unknown error";
+
+    if (reason.startsWith("forbidden:")) {
+        const r = reason.slice("forbidden:".length);
+        if (r.includes("allowlist_empty")) return "Server admin allowlist is empty (ADMIN_EMAILS).";
+        if (r.includes("missing_access_email")) return "Cloudflare Access email header is missing. Check Access policy.";
+        if (r.includes("not_in_allowlist")) return "Your email is not allowed (ADMIN_EMAILS).";
+        return `Not allowed: ${r}`;
+    }
+
+    if (reason.startsWith("http_")) return `Save failed: ${reason}`;
+    return reason;
+}
+
 export default function AdminPage() {
     const params = useParams();
     const locale: Locale = isLocale(params.lang) ? params.lang : "en";
@@ -479,12 +494,11 @@ export default function AdminPage() {
 
             void Api.setBundle(next)
                 .then((r: unknown) => {
-                    // FE: Api.setBundle can return void or {ok...}. Handle both.
                     if (r && typeof r === "object" && "ok" in r) {
                         const rr = r as SetBundleResult;
-                        if (rr.ok === false) {
+                        if ((rr as any).ok === false) {
                             setSaveState("error");
-                            setSaveMsg(String(rr.reason));
+                            setSaveMsg(humanizeSaveReason(String((rr as any).reason ?? "unknown")));
                             return;
                         }
                     }
@@ -778,7 +792,12 @@ Full description…`
 
         normalizeServicesAcrossLocales(next);
 
-        await Api.setBundle(next);
+        const r = await Api.setBundle(next);
+        if (r && typeof r === "object" && "ok" in r) {
+            const rr = r as SetBundleResult;
+            if ((rr as any).ok === false) throw new Error(humanizeSaveReason(String((rr as any).reason ?? "unknown")));
+        }
+
         setBundle(next);
         setModel(next.content[locale] ?? next.content[next.defaultLocale]);
     }

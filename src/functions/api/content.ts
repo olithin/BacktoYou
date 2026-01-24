@@ -24,30 +24,33 @@ function json(res: unknown, init?: ResponseInit) {
     });
 }
 
-function badRequest(msg: string) {
-    return json({ error: "bad_request", message: msg }, { status: 400 });
+function badRequest(message: string) {
+    return json({ ok: false, error: "bad_request", message }, { status: 400 });
 }
 
-function forbidden(reason: string) {
-    return json({ error: "forbidden", reason }, { status: 403 });
+function forbidden(reason: string, extra?: Record<string, unknown>) {
+    return json({ ok: false, error: "forbidden", reason, ...(extra ?? {}) }, { status: 403 });
+}
+
+function methodNotAllowed() {
+    return json({ ok: false, error: "method_not_allowed" }, { status: 405 });
 }
 
 function readAccessEmail(req: Request): string {
     // BE: Cloudflare Access injects this header after successful login.
-    return (
+    const raw =
         req.headers.get("Cf-Access-Authenticated-User-Email") ||
         req.headers.get("cf-access-authenticated-user-email") ||
-        ""
-    )
-        .toLowerCase()
-        .trim();
+        "";
+
+    return raw.toLowerCase().trim();
 }
 
-function readAllowedEmails(env: any): string[] {
+function readAllowedEmails(env: Env): string[] {
     const listRaw = String(env.ADMIN_EMAILS ?? "");
     return listRaw
         .split(",")
-        .map((s: string) => s.toLowerCase().trim())
+        .map((s) => s.toLowerCase().trim())
         .filter(Boolean);
 }
 
@@ -56,7 +59,7 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
 
     if (request.method === "GET") {
         const raw = await env.KV.get(KEY);
-        if (!raw) return json({ error: "No content in KV yet" }, { status: 404 });
+        if (!raw) return json({ ok: false, error: "not_found", message: "No content in KV yet" }, { status: 404 });
 
         return new Response(raw, {
             headers: {
@@ -70,8 +73,11 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
         const email = readAccessEmail(request);
         const allowed = readAllowedEmails(env);
 
+        // BE: Safety guard. If allowlist is empty, deny writes.
+        if (allowed.length === 0) return forbidden("allowlist_empty");
+
         if (!email) return forbidden("missing_access_email");
-        if (!allowed.includes(email)) return forbidden("not_in_allowlist");
+        if (!allowed.includes(email)) return forbidden("not_in_allowlist", { email });
 
         let obj: unknown;
         try {
@@ -80,7 +86,7 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
             return badRequest("Invalid JSON");
         }
 
-        // BE: minimal sanity check
+        // BE: Minimal sanity check
         const anyObj = obj as any;
         if (!anyObj || typeof anyObj !== "object") return badRequest("Body must be an object");
         if (!anyObj.content || typeof anyObj.content !== "object") return badRequest("Missing 'content' object");
@@ -91,5 +97,5 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
         return json({ ok: true });
     }
 
-    return json({ error: "method_not_allowed" }, { status: 405 });
+    return methodNotAllowed();
 };

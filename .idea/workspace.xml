@@ -5,10 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6d0b432-56d5-45c0-ab0c-b4f8773b302c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/functions/api/content.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/functions/api/content.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/functions/api/whoami.ts" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/AdminPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AdminPage.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -73,7 +72,7 @@
       <option name="presentableId" value="Default" />
       <updated>1767644642998</updated>
       <workItem from="1767644644109" duration="30737000" />
-      <workItem from="1769253495949" duration="16038000" />
+      <workItem from="1769253495949" duration="16925000" />
     </task>
     <task id="LOCAL-00001" summary="fix project">
       <option name="closed" value="true" />
@@ -259,7 +258,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769255063258</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="added security to admin tool">
+      <option name="closed" value="true" />
+      <created>1769283893374</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1769283893374</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -291,7 +298,8 @@
     <MESSAGE value="ordered services" />
     <MESSAGE value="ordedred admin tool" />
     <MESSAGE value="text content changed" />
-    <option name="LAST_COMMIT_MESSAGE" value="text content changed" />
+    <MESSAGE value="added security to admin tool" />
+    <option name="LAST_COMMIT_MESSAGE" value="added security to admin tool" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
