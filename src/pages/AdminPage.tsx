@@ -8,9 +8,13 @@ import { isLocale } from "../app/locale";
 import Cropper, { type Area } from "react-easy-crop";
 import { cropToDataUrl, fileToDataUrl } from "../app/image";
 
+type SetBundleResult = { ok: true } | { ok: false; reason: string };
+
 /** FE: Simple Markdown editor with toolbar + live preview. */
 function MdEditor(props: { label: string; value: string; onChange: (v: string) => void; hint?: string; rows?: number }) {
     const html = useMemo(() => mdToSafeHtml(props.value), [props.value]);
+
+    // FE: Use native textarea to avoid React "ref" warning if AppShell.Textarea is not forwardRef.
     const taRef = useRef<HTMLTextAreaElement | null>(null);
 
     function applyEdit(
@@ -116,12 +120,12 @@ function MdEditor(props: { label: string; value: string; onChange: (v: string) =
                     </div>
                 </div>
 
-                <Textarea
+                <textarea
                     ref={taRef}
                     rows={props.rows ?? 10}
                     value={props.value}
                     onChange={(e) => props.onChange(e.target.value)}
-                    className="mt-1 font-mono text-sm"
+                    className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 font-mono text-sm outline-none focus:ring-2 focus:ring-zinc-200"
                 />
 
                 <div className="mt-2 text-xs text-zinc-500">Formatting: Markdown (supports **bold**, *italic*, lists, headings, links).</div>
@@ -275,7 +279,7 @@ function PublicUploadsImageField(props: {
     onChange: (v: string) => void;
     aspect: number;
     title: string;
-    uploadFileName: string; // e.g. "avatar-1.webp"
+    uploadFileName: string;
     hint?: React.ReactNode;
 }) {
     const fileRef = useRef<HTMLInputElement | null>(null);
@@ -360,11 +364,10 @@ function PublicUploadsImageField(props: {
 
 function ServiceEditor(props: {
     svc: ServiceCard;
-    onChange: (patch: Partial<ServiceCard>) => void; // FE: title + md are per-locale
+    onChange: (patch: Partial<ServiceCard>) => void;
     onDelete: () => void;
     onSharedPatchAllLocales: (serviceId: string, patch: Partial<Pick<ServiceCard, "imageUrl" | "price">>) => void;
 
-    // FE: Reorder (shared across locales)
     canMoveUp: boolean;
     canMoveDown: boolean;
     onMoveUp: () => void;
@@ -463,18 +466,44 @@ export default function AdminPage() {
     // FE: Debounced persistence to avoid race conditions while typing.
     const saveTimer = useRef<number | null>(null);
 
+    // FE: Save status
+    const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+    const [saveMsg, setSaveMsg] = useState<string>("");
+
     function persistDebounced(next: ContentBundle) {
         if (saveTimer.current) window.clearTimeout(saveTimer.current);
+
         saveTimer.current = window.setTimeout(() => {
-            void Api.setBundle(next); // FE: Save to localStorage (static-friendly)
-        }, 300);
+            setSaveState("saving");
+            setSaveMsg("");
+
+            void Api.setBundle(next)
+                .then((r: unknown) => {
+                    // FE: Api.setBundle can return void or {ok...}. Handle both.
+                    if (r && typeof r === "object" && "ok" in r) {
+                        const rr = r as SetBundleResult;
+                        if (rr.ok === false) {
+                            setSaveState("error");
+                            setSaveMsg(String(rr.reason));
+                            return;
+                        }
+                    }
+
+                    setSaveState("saved");
+                    setSaveMsg("Saved");
+                    window.setTimeout(() => setSaveState("idle"), 900);
+                })
+                .catch((e) => {
+                    setSaveState("error");
+                    setSaveMsg(String(e?.message ?? e));
+                });
+        }, 450);
     }
 
     function mutateBundle(mutator: (b: ContentBundle) => void) {
         setBundle((prev) => {
             if (!prev) return prev;
 
-            // FE: Content is JSON, safe to deep-clone.
             const next = JSON.parse(JSON.stringify(prev)) as ContentBundle;
 
             mutator(next);
@@ -492,7 +521,6 @@ export default function AdminPage() {
     const SUPPORTED_LOCALES: Locale[] = ["en", "ru", "el"];
 
     function ensureLocale(b: ContentBundle, l: Locale): ContentModel {
-        // FE: Some locales might not exist yet in the bundle (common). Create them from default.
         const existing = b.content[l];
         if (existing) return existing;
 
@@ -503,7 +531,6 @@ export default function AdminPage() {
     }
 
     function normalizeServicesAcrossLocales(b: ContentBundle) {
-        // FE: Canonical order = defaultLocale services + any missing ids appended in first-seen order.
         const masterLocale = b.defaultLocale as Locale;
         const master = ensureLocale(b, masterLocale);
 
@@ -514,13 +541,11 @@ export default function AdminPage() {
         const order: string[] = [];
         for (const s of master.services ?? []) pushUnique(order, s.id);
 
-        // FE: Merge ids from other locales (if someone added services in RU/EL earlier).
         for (const l of SUPPORTED_LOCALES) {
             const m = ensureLocale(b, l);
             for (const s of m.services ?? []) pushUnique(order, s.id);
         }
 
-        // FE: Build a source map to clone missing services into locales that don't have them.
         const byId = new Map<string, ServiceCard>();
         for (const l of SUPPORTED_LOCALES) {
             const m = ensureLocale(b, l);
@@ -529,21 +554,15 @@ export default function AdminPage() {
             }
         }
 
-        // FE: Reorder each locale services to match canonical `order`.
         for (const l of SUPPORTED_LOCALES) {
             const m = ensureLocale(b, l);
             const map = new Map((m.services ?? []).map((s) => [s.id, s] as const));
-
-            const next = order
-                .map((id) => map.get(id) ?? byId.get(id))
-                .filter(Boolean) as ServiceCard[];
-
+            const next = order.map((id) => map.get(id) ?? byId.get(id)).filter(Boolean) as ServiceCard[];
             b.content[l] = { ...m, services: next };
         }
     }
 
     function applyServicesOrderAllLocales(b: ContentBundle, orderIds: string[]) {
-        // FE: Build a global source map so missing services can be cloned if needed.
         const byId = new Map<string, ServiceCard>();
         for (const l of SUPPORTED_LOCALES) {
             const m = ensureLocale(b, l);
@@ -555,11 +574,7 @@ export default function AdminPage() {
         for (const l of SUPPORTED_LOCALES) {
             const m = ensureLocale(b, l);
             const map = new Map((m.services ?? []).map((s) => [s.id, s] as const));
-
-            const next = orderIds
-                .map((id) => map.get(id) ?? byId.get(id))
-                .filter(Boolean) as ServiceCard[];
-
+            const next = orderIds.map((id) => map.get(id) ?? byId.get(id)).filter(Boolean) as ServiceCard[];
             b.content[l] = { ...m, services: next };
         }
     }
@@ -567,11 +582,12 @@ export default function AdminPage() {
     useEffect(() => {
         Api.getBundle()
             .then((b) => {
-                // FE: Normalize services across locales on load to fix "drift" in older content.
                 const next = JSON.parse(JSON.stringify(b)) as ContentBundle;
                 normalizeServicesAcrossLocales(next);
 
-                void Api.setBundle(next);
+                // FE: Try to persist normalized state once. If not authorized, ignore.
+                void Api.setBundle(next).catch(() => void 0);
+
                 setBundle(next);
                 setModel(next.content[locale] ?? next.content[next.defaultLocale]);
             })
@@ -602,7 +618,6 @@ export default function AdminPage() {
         });
     }
 
-    // FE: Shared image patcher (apply to all locales, even if locale branch didn't exist yet).
     function patchHeroImageAllLocales(imageUrl: string) {
         mutateBundle((b) => {
             for (const l of SUPPORTED_LOCALES) {
@@ -612,7 +627,6 @@ export default function AdminPage() {
         });
     }
 
-    // FE: Shared about media patcher (apply to all locales, even if locale branch didn't exist yet).
     function patchAboutMediaAllLocales(patch: Partial<NonNullable<ContentModel["blocks"]["about"]["media"]>>) {
         mutateBundle((b) => {
             for (const l of SUPPORTED_LOCALES) {
@@ -651,14 +665,11 @@ export default function AdminPage() {
         mutateBundle((b) => {
             const id = crypto.randomUUID().slice(0, 10);
 
-            // FE: Add the same service id into ALL locales so lists never drift.
-            // FE: Add to the END of the list.
             for (const l of SUPPORTED_LOCALES) {
                 const m = ensureLocale(b, l);
 
                 const svc: ServiceCard = {
                     id,
-                    // FE: Localized fields are per-locale. We prefill only for the current editor locale.
                     title: l === locale ? "New service" : "",
                     price: "€0",
                     shortMd: l === locale ? "Short description…" : "",
@@ -671,6 +682,7 @@ Full description…`
                     imageUrl: "",
                 };
 
+                // FE: Append to END.
                 b.content[l] = { ...m, services: [...(m.services ?? []), svc] };
             }
 
@@ -683,27 +695,22 @@ Full description…`
             const m = b.content[locale] ?? b.content[b.defaultLocale];
             const next = (m.services ?? []).map((s) => (s.id === id ? { ...s, ...patch, id } : s));
             b.content[locale] = { ...m, services: next };
-
-            // FE: Keep a stable order even after edits (some locales may still drift in older data).
             normalizeServicesAcrossLocales(b);
         });
     }
 
     function deleteService(id: string) {
         mutateBundle((b) => {
-            // FE: Delete in ALL locales to avoid ghost cards in other languages.
             for (const l of SUPPORTED_LOCALES) {
                 const m = ensureLocale(b, l);
                 b.content[l] = { ...m, services: (m.services ?? []).filter((s) => s.id !== id) };
             }
-
             normalizeServicesAcrossLocales(b);
         });
     }
 
     function moveServiceAllLocales(serviceId: string, dir: -1 | 1) {
         mutateBundle((b) => {
-            // FE: Start from a consistent state.
             normalizeServicesAcrossLocales(b);
 
             const masterLocale = b.defaultLocale as Locale;
@@ -716,18 +723,13 @@ Full description…`
             const nextIdx = idx + dir;
             if (nextIdx < 0 || nextIdx >= ids.length) return;
 
-            // FE: Swap in canonical order.
             [ids[idx], ids[nextIdx]] = [ids[nextIdx], ids[idx]];
-
-            // FE: Apply to all locales.
             applyServicesOrderAllLocales(b, ids);
         });
     }
 
-    // FE: Shared service fields patcher (apply to all locales).
     function patchServiceSharedAllLocales(serviceId: string, patch: Partial<Pick<ServiceCard, "imageUrl" | "price">>) {
         mutateBundle((b) => {
-            // FE: If some locale misses this service ID, copy it from the current locale.
             const sourceModel = b.content[locale] ?? b.content[b.defaultLocale];
             const sourceSvc = (sourceModel.services ?? []).find((s) => s.id === serviceId);
 
@@ -741,7 +743,7 @@ Full description…`
                 if (idx >= 0) {
                     nextServices = list.map((s) => (s.id === serviceId ? { ...s, ...patch } : s));
                 } else if (sourceSvc) {
-                    // FE: Append (not prepend) so we do not reorder lists unexpectedly.
+                    // FE: Append (not prepend) to avoid unexpected reorders.
                     nextServices = [...list, { ...sourceSvc, ...patch }];
                 } else {
                     nextServices = list;
@@ -774,10 +776,8 @@ Full description…`
         const text = await file.text();
         const next = JSON.parse(text) as ContentBundle;
 
-        // FE: Normalize right away to fix older/broken ordering in imported content.
         normalizeServicesAcrossLocales(next);
 
-        // FE: Save and reflect immediately without refetch.
         await Api.setBundle(next);
         setBundle(next);
         setModel(next.content[locale] ?? next.content[next.defaultLocale]);
@@ -805,10 +805,19 @@ Full description…`
     const { site, blocks } = model;
 
     const highlights = (blocks.about.highlights ?? ["", "", ""]).concat(["", "", ""]).slice(0, 3);
-
-    // FE: Read from current locale (values are shared via patchAboutMediaAllLocales).
     const avatarUrls = (blocks.about.media?.avatarUrls ?? ["", "", ""]).concat(["", "", ""]).slice(0, 3);
     const diplomaUrl = blocks.about.media?.diplomaUrl ?? "";
+
+    const saveBadge = saveState === "saving" ? "Saving…" : saveState === "saved" ? "Saved" : saveState === "error" ? "Save error" : "";
+
+    const saveBadgeClass =
+        saveState === "saving"
+            ? "text-zinc-600"
+            : saveState === "saved"
+                ? "text-green-700"
+                : saveState === "error"
+                    ? "text-red-700"
+                    : "text-zinc-400";
 
     return (
         <div className="space-y-6">
@@ -821,21 +830,25 @@ Full description…`
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                         {(["en", "ru", "el"] as const).map((l) => (
                             <Link
                                 key={l}
                                 to={`/${l}/admin`}
                                 className={
                                     "px-2 py-1 rounded border text-xs " +
-                                    (l === locale
-                                        ? "bg-zinc-900 text-white border-zinc-900"
-                                        : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50")
+                                    (l === locale ? "bg-zinc-900 text-white border-zinc-900" : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50")
                                 }
                             >
                                 {l.toUpperCase()}
                             </Link>
                         ))}
+
+                        <div className="w-px h-6 bg-zinc-200 mx-2" />
+
+                        <div className={`text-xs ${saveBadgeClass}`} title={saveMsg}>
+                            {saveBadge}
+                        </div>
 
                         <div className="w-px h-6 bg-zinc-200 mx-2" />
 
@@ -858,7 +871,8 @@ Full description…`
                 </div>
 
                 <div className="text-xs text-zinc-500 mt-3">
-                    Flow: edit → Export JSON → replace <code>public/content.json</code> in repo → deploy.
+                    Flow: edit → auto-save to Cloudflare KV → site reads updated content instantly.
+                    {saveState === "error" && saveMsg ? <div className="mt-1 text-red-700">{saveMsg}</div> : null}
                 </div>
             </Card>
 
@@ -918,19 +932,11 @@ Full description…`
                     </div>
                     <div>
                         <Label>Secondary CTA Text</Label>
-                        <Input
-                            value={blocks.hero.secondaryCtaText}
-                            onChange={(e) => patchHero({ secondaryCtaText: e.target.value })}
-                            className="mt-1"
-                        />
+                        <Input value={blocks.hero.secondaryCtaText} onChange={(e) => patchHero({ secondaryCtaText: e.target.value })} className="mt-1" />
                     </div>
                     <div>
                         <Label>Secondary CTA Href</Label>
-                        <Input
-                            value={blocks.hero.secondaryCtaHref}
-                            onChange={(e) => patchHero({ secondaryCtaHref: e.target.value })}
-                            className="mt-1"
-                        />
+                        <Input value={blocks.hero.secondaryCtaHref} onChange={(e) => patchHero({ secondaryCtaHref: e.target.value })} className="mt-1" />
                     </div>
                 </div>
             </Card>
@@ -965,7 +971,6 @@ Full description…`
                     </div>
                 </div>
 
-                {/* NEW: About media editor */}
                 <div className="pt-2">
                     <div className="text-sm font-semibold text-zinc-900">About media (3 circles + diploma)</div>
                     <div className="text-xs text-zinc-500 mt-1">
@@ -1051,7 +1056,7 @@ Full description…`
                 </div>
 
                 <div className="space-y-4">
-                    {model.services.map((s, i) => (
+                    {(model.services ?? []).map((s, i) => (
                         <ServiceEditor
                             key={s.id}
                             svc={s}
@@ -1059,7 +1064,7 @@ Full description…`
                             onDelete={() => deleteService(s.id)}
                             onSharedPatchAllLocales={patchServiceSharedAllLocales}
                             canMoveUp={i > 0}
-                            canMoveDown={i < model.services.length - 1}
+                            canMoveDown={i < (model.services ?? []).length - 1}
                             onMoveUp={() => moveServiceAllLocales(s.id, -1)}
                             onMoveDown={() => moveServiceAllLocales(s.id, +1)}
                         />

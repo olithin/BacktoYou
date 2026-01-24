@@ -14,10 +14,11 @@
     "nanoid": "^5.0.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.2",
-    "react-easy-crop": "^5.0.5"
+    "react-easy-crop": "^5.0.5",
+    "react-router-dom": "^6.26.2"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260124.0",
     "@types/node": "^22.10.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
