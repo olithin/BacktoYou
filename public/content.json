@@ -80,7 +80,7 @@
     },
     "ru": {
       "site": {
-        "brand": "Back to You",
+        "brand": "Путь к себе",
         "tagline": "Спокойно. Понятно. Эффективно.",
         "theme": {
           "accent": "#f97316"
@@ -88,7 +88,7 @@
       },
       "blocks": {
         "hero": {
-          "title": "Back to You",
+          "title": "Путь к себе",
           "subtitle": "Безопасное пространство, чтобы понять, что с вами происходит и что вам нужно.\n\n- **Без осуждения.** С уважением и конфиденциальностью.\n- **Понимание и поддержка.** Находим причины и укрепляем устойчивость.\n- **Маленькие шаги к изменениям.** Реальные перемены, которые остаются.\n",
           "primaryCtaText": "Записаться",
           "primaryCtaHref": "#services",
@@ -120,7 +120,7 @@
         },
         "footer": {
           "title": "Контакты",
-          "bodyMd": "Email: **ladakirsanova1@gmail.com**\n\nTikTok: **@backtoyou**"
+          "bodyMd": "Email: **hello@backtoyou.local**\n\nInstagram: **@backtoyou**\n\nAddress: Athens (demo)"
         }
       },
       "services": [
@@ -192,7 +192,7 @@
         },
         "footer": {
           "title": "Επικοινωνία",
-          "bodyMd": "Email: **ladakirsanova1@gmail.com**\n\nTikTok: **@backtoyou**"
+          "bodyMd": "Email: **hello@backtoyou.local**\n\nInstagram: **@backtoyou**\n\nAddress: Athens (demo)"
         }
       },
       "services": [

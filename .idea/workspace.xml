@@ -4,11 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6d0b432-56d5-45c0-ab0c-b4f8773b302c" name="Changes" comment="" />
+    <list default="true" id="d6d0b432-56d5-45c0-ab0c-b4f8773b302c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/content.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/content.json" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="39" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -33,6 +40,10 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="mock://C:/Repo/Fix_Lada/data/content.json" root0="FORCE_HIGHLIGHTING" />
   </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -46,9 +57,11 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "git-widget-placeholder": "main",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -59,6 +72,9 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecapUselessUpdatesCounter">
+    <option name="suspendCountdown" value="9" />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="d6d0b432-56d5-45c0-ab0c-b4f8773b302c" name="Changes" comment="" />
@@ -68,6 +84,7 @@
       <updated>1767644642998</updated>
       <workItem from="1767644644109" duration="30737000" />
       <workItem from="1769253495949" duration="20180000" />
+      <workItem from="1769871073733" duration="1188000" />
     </task>
     <task id="LOCAL-00001" summary="fix project">
       <option name="closed" value="true" />
@@ -277,7 +294,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769292623803</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="fix assets">
+      <option name="closed" value="true" />
+      <created>1769294325873</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1769294325873</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -311,7 +336,8 @@
     <MESSAGE value="text content changed" />
     <MESSAGE value="added security to admin tool" />
     <MESSAGE value="fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix" />
+    <MESSAGE value="fix assets" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix assets" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
