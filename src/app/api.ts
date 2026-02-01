@@ -8,14 +8,17 @@ import { nanoid } from "nanoid";
  * - Fallback 2: /content.json (seed public asset).
  *
  * Auth:
- * - Prod: PUT is protected server-side by Cloudflare Access + ADMIN_EMAILS allowlist.
- * - Dev: if DEV_BYPASS_AUTH="true" on server, client must send X-Dev-Admin-Token.
+ * - PUT is protected server-side by Cloudflare Access + ADMIN_EMAILS allowlist (prod).
+ * - DEV may use X-Dev-Admin-Token if enabled server-side.
  */
 
 const LS_BUNDLE_KEY = "lada_content_bundle_v2_cache";
 const API_CONTENT_URL = "/api/content";
-const DEV_ADMIN_TOKEN = (import.meta as any)?.env?.VITE_DEV_ADMIN_TOKEN ? String((import.meta as any).env.VITE_DEV_ADMIN_TOKEN) : "";
-const DEV_TOKEN_HEADER = "X-Dev-Admin-Token";
+
+// FE: dev token (only exists in local dev)
+const DEV_ADMIN_TOKEN = (import.meta as any)?.env?.VITE_DEV_ADMIN_TOKEN
+    ? String((import.meta as any).env.VITE_DEV_ADMIN_TOKEN)
+    : "";
 
 function jsonTry<T>(s: string | null): T | null {
     if (!s) return null;
@@ -60,6 +63,7 @@ function getOrInitLocale(bundle: ContentBundle, locale: Locale): ContentModel {
     const hit = bundle.content?.[locale];
     if (hit) return hit;
 
+    // FE: If locale missing, clone default as a starting point.
     const fallback = bundle.content[bundle.defaultLocale];
     const cloned = JSON.parse(JSON.stringify(fallback)) as ContentModel;
     bundle.content[locale] = cloned;
@@ -74,7 +78,7 @@ async function parseErrorBody(res: Response): Promise<string> {
 
     try {
         const j = JSON.parse(txt) as any;
-        if (j?.reason) return String(j.reason);   // backend already returns "forbidden:..."
+        if (j?.reason) return String(j.reason);
         if (j?.message) return String(j.message);
         if (j?.error) return String(j.error);
     } catch {
@@ -97,13 +101,17 @@ export const Api = {
     },
 
     async setBundle(bundle: ContentBundle): Promise<SetBundleResult> {
+        // FE: optimistic local cache
         saveLocalBundleCache(bundle);
 
         const text = JSON.stringify(bundle, null, 2);
 
-        const headers: Record<string, string> = { "content-type": "application/json" };
-        // Dev-only: send token if present
-        if (DEV_ADMIN_TOKEN) headers[DEV_TOKEN_HEADER] = DEV_ADMIN_TOKEN;
+        const headers: Record<string, string> = {
+            "content-type": "application/json",
+        };
+
+        // FE: send dev token only when present
+        if (DEV_ADMIN_TOKEN) headers["X-Dev-Admin-Token"] = DEV_ADMIN_TOKEN;
 
         const res = await fetch(API_CONTENT_URL, {
             method: "PUT",
@@ -115,8 +123,7 @@ export const Api = {
             const details = await parseErrorBody(res);
             return {
                 ok: false,
-                // Keep server reason as-is when possible (it already uses "forbidden:*", "bad_request:*", etc.)
-                reason: details.startsWith("forbidden:") || details.startsWith("bad_request:") ? details : `http_${res.status}:${details}`,
+                reason: res.status === 403 ? `forbidden:${details}` : `http_${res.status}:${details}`,
                 status: res.status,
                 details,
             };

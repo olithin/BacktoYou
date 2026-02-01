@@ -5,21 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6d0b432-56d5-45c0-ab0c-b4f8773b302c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/AppShell.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/AppShell.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.wrangler/state/v3/kv/0b001c04e0f44e79bd034ae2ea3b0cb9/blobs/f0da03fe0dc164dbc8e8fe0d7758dee52c9f2ae51dc5c32bd14d4278a024a6990000019c1b21ad95" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.wrangler/state/v3/kv/miniflare-KVNamespaceObject/97de02adfa76c4f04471c08d755974598a56293354a2d2b1f570af3d4ccfdd1f.sqlite" beforeDir="false" afterPath="$PROJECT_DIR$/.wrangler/state/v3/kv/miniflare-KVNamespaceObject/97de02adfa76c4f04471c08d755974598a56293354a2d2b1f570af3d4ccfdd1f.sqlite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.wrangler/tmp/bundle-EdrqdP/middleware-insertion-facade.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.wrangler/tmp/bundle-EdrqdP/middleware-loader.entry.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.wrangler/tmp/bundle-V4nFjc/middleware-insertion-facade.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.wrangler/tmp/bundle-V4nFjc/middleware-loader.entry.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.wrangler/tmp/dev-1qsmcU/functionsWorker-0.0387024061558342.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.wrangler/tmp/dev-1qsmcU/functionsWorker-0.0387024061558342.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.wrangler/tmp/pages-ZLi8sr/functionsRoutes-0.820239166540003.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.wrangler/tmp/pages-ZLi8sr/functionsWorker-0.0387024061558342.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.wrangler/tmp/pages-ZLi8sr/functionsWorker-0.0387024061558342.mjs.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/functions/api/content.ts" beforeDir="false" afterPath="$PROJECT_DIR$/functions/api/content.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/i18n.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/i18n.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/image.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/image.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/md.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/md.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/types.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/functions/api/content.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/AdminPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AdminPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/vite.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,6 +60,9 @@
   &quot;associatedIndex&quot;: 8
 }</component>
   <component name="ProjectId" id="37qxwhYshDxuJnO2a2jqaGDjClG" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -101,7 +103,7 @@
       <workItem from="1767644644109" duration="30737000" />
       <workItem from="1769253495949" duration="20180000" />
       <workItem from="1769871073733" duration="2890000" />
-      <workItem from="1769937523081" duration="19188000" />
+      <workItem from="1769937523081" duration="21654000" />
     </task>
     <task id="LOCAL-00001" summary="fix project">
       <option name="closed" value="true" />
@@ -335,7 +337,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769872888786</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="added gitignore">
+      <option name="closed" value="true" />
+      <created>1769981991771</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1769981991771</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -356,7 +366,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix project" />
     <MESSAGE value="first added" />
     <MESSAGE value="first block" />
     <MESSAGE value="first course" />
@@ -381,7 +390,8 @@
     <MESSAGE value="added security to admin tool" />
     <MESSAGE value="fix assets" />
     <MESSAGE value="fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix" />
+    <MESSAGE value="added gitignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="added gitignore" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
