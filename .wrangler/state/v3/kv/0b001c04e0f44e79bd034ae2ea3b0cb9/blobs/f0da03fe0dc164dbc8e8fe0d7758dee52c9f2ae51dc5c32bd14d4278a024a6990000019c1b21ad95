@@ -1,0 +1,226 @@
+{
+  "defaultLocale": "en",
+  "locales": [
+    "en",
+    "ru",
+    "el"
+  ],
+  "content": {
+    "en": {
+      "site": {
+        "brand": "Back to Yo",
+        "tagline": "Services that bring you back to yourself.",
+        "theme": {
+          "accent": "#f97316"
+        }
+      },
+      "blocks": {
+        "hero": {
+          "title": "Back to You",
+          "subtitle": "A safe space to understand what’s happening and what you need.\n\n- **Listening without judgment.** With respect and confidentiality.\n- **Understanding & empowerment.** We find the roots and build resilience.\n- **Action in small steps.** Realistic changes that last.\n",
+          "primaryCtaText": "Book a session",
+          "primaryCtaHref": "#services",
+          "secondaryCtaText": "Learn more",
+          "secondaryCtaHref": "#about",
+          "imageUrl": "/uploads/hero.webp"
+        },
+        "about": {
+          "title": "About",
+          "bodyMd": "## About me\n\nThis is a safe space to understand what’s happening and what you truly need.  \nWe work calmly and clearly, with respect, confidentiality, and zero judgment.\n\n### How we work together\n\n- **Clear the mental “noise”.** We sort through thoughts, emotions, and patterns that drain you.\n- **Find what keeps you stuck.** Old experiences, fear, guilt, overload.\n- **Reset your inner compass.** So decisions feel clearer and steadier.\n- **Small steps, real change.** Practical actions that actually last.\n\n### What I can help with\n\n- stress, anxiety, burnout, overwhelm  \n- relationships and healthy boundaries  \n- self-esteem, inner confusion  \n- life transitions, crises, feeling “stuck”\n\n> The goal: more calm, more clarity, and a life that fits you.\n",
+          "media": {
+            "avatarUrls": [
+              "/uploads/avatar-1.webp",
+              "/uploads/avatar-2.webp",
+              "/uploads/avatar-3.webp"
+            ],
+            "diplomaUrl": "/uploads/diploma.webp"
+          }
+        },
+        "services": {
+          "title": "Services",
+          "subtitle": "Click a card to expand and see full details."
+        },
+        "cta": {
+          "title": "Ready to begin?",
+          "bodyMd": "If something feels “blocked”, we can untangle it together.  \nIn the first session we clarify your goal and choose the next steps, calmly and safely.\n",
+          "buttonText": "Contact",
+          "buttonHref": "#footer"
+        },
+        "footer": {
+          "title": "Contact",
+          "bodyMd": "Email: **ladakirsanova1@gmail.com**\n\nTikTok: **@backtoyou**\n"
+        }
+      },
+      "services": [
+        {
+          "id": "svc_1",
+          "title": "Free Diagnostic Consultation (20–30 minutes)",
+          "shortMd": "is your first step toward change.\nDuring the consultation, we’ll discuss your current situation, identify the key points, and clarify how I can help you achieve the results you want.",
+          "fullMd": "You’ll gain clarity about what’s going on and leave with a sense of how to move forward. This consultation is completely free and comes with no obligation, so you can experience my approach and see if it feels right for you.\n",
+          "price": "€10",
+          "imageUrl": "/uploads/service-svc_1.webp"
+        },
+        {
+          "id": "svc_2",
+          "title": "Personal support and subconscious work",
+          "shortMd": "If you feel stuck, exhausted from handling everything alone, and you don’t know where to go next, you don’t need another “general talk.”\nYou need support, structure, and someone by your side who can guide you through this period.\nThat’s exactly what this support format is for.",
+          "fullMd": "What you get:\n\n✔ 4 private sessions (120 minutes each)\nOnline or in person. We work deeply and precisely with your request, using effective subconscious work techniques.\n\n✔ Support between sessions\nFor one month, you can message me with voice notes on weekdays, so you’re not left alone with anxiety, doubts, and difficult emotional states.\n\n✔ Full guidance from A to Z\nI don’t leave you alone between meetings. I guide you step by step toward stable change, not temporary relief.\n\n✔ Personal exercises and meditations\nChosen specifically for you, so the results закрепляются (stick) and keep working in your everyday life.\n\nThis format is for you if you:\n\nfeel inner confusion and fatigue\n\nare going through a crisis or a difficult life stage\n\nhave lost your inner support and sense of meaning\n\nare leaving painful or destructive relationships\n\nknow “I can’t keep living like this,” but don’t know where to start\n\nMy goal is to help you move through the crisis and rebuild inner stability, not just “talk.”\nYou will get clear guidance, real support, and deep work with the root causes of what’s happening in your life.\n\nBonus for you\n\nBefore we begin, you receive a FREE diagnostic consultation, where we will:\n\nclarify your request\n\ndecide whether this format is right for you\n\nagree on all details of the work ahead\n\nProgram duration: 1 month.\n\n📌 If this resonates with you, don’t postpone it.\nThe longer you stay in a crisis, the more energy it takes from you.\nSometimes one right decision and the right support can change everything.\n\n👉 Book your free diagnostic consultation and take your first step toward change today.",
+          "price": "€250",
+          "imageUrl": "/uploads/service-svc_2.webp"
+        },
+        {
+          "id": "svc_3",
+          "title": "Εντατική υπνοθεραπευτική υποστήριξη με εξατομικευμένο πρόγραμμα",
+          "shortMd": "Best value if you want progress you can feel.",
+          "fullMd": "## Package (4 sessions)\n\nDesigned for momentum.\n\n**You get:**\n- weekly sessions\n- homework\n- progress tracking",
+          "price": "€350",
+          "imageUrl": "/uploads/service-svc_3.webp"
+        }
+      ]
+    },
+    "ru": {
+      "site": {
+        "brand": "Путь к себе",
+        "tagline": "Спокойно. Понятно. Эффективно.",
+        "theme": {
+          "accent": "#f97316"
+        }
+      },
+      "blocks": {
+        "hero": {
+          "title": "Путь к себе",
+          "subtitle": "Безопасное пространство, чтобы понять, что с вами происходит и что вам нужно.\n\n- **Без осуждения.** С уважением и конфиденциальностью.\n- **Понимание и поддержка.** Находим причины и укрепляем устойчивость.\n- **Находим  шаги к изменениям.** Реальные перемены, которые остаются.\n",
+          "primaryCtaText": "Записаться",
+          "primaryCtaHref": "#services",
+          "secondaryCtaText": "Подробнее",
+          "secondaryCtaHref": "#about",
+          "imageUrl": "/uploads/hero.webp"
+        },
+        "about": {
+          "title": "Обо мне",
+          "bodyMd": "## Обо мне\n\nЭто безопасное пространство, где можно понять, что с вами происходит и что вам сейчас действительно нужно.  \nМы работаем спокойно и бережно: без давления, без оценок, с уважением и конфиденциальностью.\n\n### Как проходит работа\n\n- **Наводим порядок в мыслях.** Убираем “шум”, проясняем чувства и повторяющиеся сценарии.\n- **Находим, что мешает двигаться.** Страхи, вина, усталость, опыт прошлого.\n- **Настраиваем внутренний ориентир.** Чтобы решения давались легче и появлялась опора.\n- **Маленькие шаги, устойчивый результат.** Реальные действия, которые можно удержать в жизни.\n\n### С какими запросами я помогаю\n\n- стресс, тревога, перегруз  \n- отношения и личные границы  \n- самооценка и внутренний хаос  \n- кризисы, перемены, ощущение “застряла”\n\n> Цель: больше спокойствия, ясности и жизнь, которая подходит именно вам.\n",
+          "media": {
+            "avatarUrls": [
+              "/uploads/avatar-1.webp",
+              "/uploads/avatar-2.webp",
+              "/uploads/avatar-3.webp"
+            ],
+            "diplomaUrl": "/uploads/diploma.webp"
+          }
+        },
+        "services": {
+          "title": "Услуги",
+          "subtitle": "Нажми на карточку, чтобы раскрыть подробности."
+        },
+        "cta": {
+          "title": "Готовы начать?",
+          "bodyMd": "\nЕсли вы чувствуете, что что-то “застряло”, мы можем разобраться вместе.  \nНа первой встрече проясним запрос и выберем следующие шаги спокойно и безопасно.\n",
+          "buttonText": "Контакт",
+          "buttonHref": "#footer"
+        },
+        "footer": {
+          "title": "Контакты",
+          "bodyMd": "Email: **hello@backtoyou.local**\n\nInstagram: **@backtoyou**\n\nAddress: Athens (demo)"
+        }
+      },
+      "services": [
+        {
+          "id": "svc_1",
+          "title": "Бесплатная диагностическая консультация (20–30 минут)",
+          "shortMd": "**Бесплатная диагностическая консультация (20–30 минут)** — это ваш первый шаг к изменениям!\nВо время консультации мы обсудим вашу текущую ситуацию, выявим ключевые моменты и определим, как я могу помочь вам достичь желаемых результатов.",
+          "fullMd": "\nВы получите ясность по поводу своих проблем и будете понимать, как двигаться дальше. Эта консультация абсолютно бесплатна и без обязательств, чтобы вы могли почувствовать, как работает мой подход.\n",
+          "price": "€10",
+          "imageUrl": "/uploads/service-svc_1.webp"
+        },
+        {
+          "id": "svc_2",
+          "title": "Персональная поддержка и работа с подсознанием",
+          "shortMd": "Если вы чувствуете, что застряли, устали бороться в одиночку и не понимаете, куда двигаться дальше — вам не нужен ещё один разговор «в общем».  \nВам нужна поддержка, структура и человек рядом, который проведёт вас через этот период.\n\nИменно для этого создан этот формат сопровождения.",
+          "fullMd": "### Что вы получаете\n\n✅ **4 индивидуальные сессии по 120 минут**  \nОнлайн или офлайн. Мы работаем глубоко и прицельно с вашим запросом, используя эффективные техники работы с подсознанием.\n\n✅ **Поддержку между сессиями**  \nВ течение месяца вы можете обращаться ко мне голосовыми сообщениями (в будние дни), чтобы не оставаться наедине с тревогами, сомнениями и сложными состояниями.\n\n✅ **Полное сопровождение «от А до Я»**  \nЯ не бросаю вас между встречами. Я веду вас шаг за шагом до устойчивых изменений, а не временного облегчения.\n\n✅ **Индивидуальные упражнения и медитации**  \nПодобранные именно под вас, чтобы результат закреплялся и продолжал работать в вашей повседневной жизни.\n\n---\n\n### Этот формат подойдёт вам, если вы:\n\n- чувствуете внутреннюю растерянность и усталость  \n- переживаете кризис или сложный жизненный этап  \n- потеряли опору и смысл  \n- выходите из болезненных или разрушающих отношений  \n- понимаете, что «так дальше нельзя», но не знаете, с чего начать  \n\n---\n\n### Моя задача\n\nПомочь вам выйти из кризиса и вернуть внутреннюю устойчивость, а не просто «поговорить».  \nВы получите чёткое сопровождение, поддержку и глубокую работу с причинами того, что происходит в вашей жизни.\n\n---\n\n### Бонус для вас\n\nПеред началом работы вы получаете **БЕСПЛАТНУЮ диагностическую консультацию**, на которой мы:\n\n- разберём ваш запрос  \n- определим, подойдёт ли вам этот формат  \n- согласуем все детали дальнейшей работы  \n\n**Продолжительность программы:** 1 месяц.\n\n---\n\n📌 **Если вы чувствуете отклик — не откладывайте.**  \nЧем дольше вы остаетесь в кризисе, тем больше он забирает сил.  \nИногда одно верное решение и правильная поддержка меняют всё.\n\n👉 **Запишитесь на бесплатную диагностическую консультацию** и сделайте первый шаг к изменениям уже сейчас.",
+          "price": "€250",
+          "imageUrl": "/uploads/service-svc_2.webp"
+        },
+        {
+          "id": "svc_3",
+          "title": "Углублённое гипносопровождение с индивидуальной программой ",
+          "shortMd": "Если вам нужна глубокая трансформация с научно обоснованными методами, регрессивной терапией и индивидуальным подходом — этот формат для вас.",
+          "fullMd": " Что вас ждёт: \n✔ 4 углублённые гипносессии по 2.5 часа Онлайн или офлайн, с применением ДПДГ, НЛП и регрессивных техник, подстроенных под ваши запросы. \n✔ Индивидуальный подход и прогресс Программа создаётся лично под вас, чтобы вы видели реальные изменения. \n✔ Голосовая поддержка (кроме выходных) \nВы можете отправлять голосовые сообщения в любое время, а я отвечу в удобное для меня время в будни. Для кого этот формат Если вы готовы к глубокой работе с подсознанием и хотите пройти путь с поддержкой и чёткой структурой, этот вариант для вас. \n👉 Запишитесь на бесплатную диагностическую консультацию и начните свой путь к изменениям уже сейчас.",
+          "price": "€350",
+          "imageUrl": "/uploads/service-svc_3.webp"
+        }
+      ]
+    },
+    "el": {
+      "site": {
+        "brand": "Back to ",
+        "tagline": "Απλά. Ήρεμα. Αποτελεσματικά.",
+        "theme": {
+          "accent": "#f97316"
+        }
+      },
+      "blocks": {
+        "hero": {
+          "title": "Πώς μπορώ να σας στηρίξω",
+          "subtitle": "Ένας ασφαλής χώρος για να καταλάβετε τι σας συμβαίνει και τι χρειάζεστε.\n\n- **Ακρόαση χωρίς κριτική.** Με σεβασμό και εχεμύθεια.\n- **Κατανόηση & ενδυνάμωση.** Βρίσκουμε τις ρίζες και χτίζουμε ανθεκτικότητα.\n- **Πράξη με μικρά βήματα.** Ρεαλιστικές αλλαγές που κρατάνε.\n",
+          "primaryCtaText": "Κλείσε ραντεβού",
+          "primaryCtaHref": "#services",
+          "secondaryCtaText": "Μάθε περισσότερα",
+          "secondaryCtaHref": "#about",
+          "imageUrl": "/uploads/hero.webp"
+        },
+        "about": {
+          "title": "Σχετικά",
+          "bodyMd": "## Λίγα λόγια για μένα\n\nΕδώ θα βρείτε έναν ασφαλή χώρο για να καταλάβετε τι σας συμβαίνει και τι πραγματικά χρειάζεστε.  \nΔουλεύουμε ήρεμα, με καθαρότητα και σεβασμό, χωρίς πίεση και χωρίς κριτική.\n\n### Πώς δουλεύουμε μαζί\n\n- **Βάζουμε τάξη στο “μέσα σας”.** Ξεκαθαρίζουμε σκέψεις, συναισθήματα και μοτίβα που σας κουράζουν.\n- **Εντοπίζουμε τι σας κρατά πίσω.** Παλιές εμπειρίες, φόβοι, ενοχές, υπερένταση.\n- **Ρυθμίζουμε την “πυξίδα” σας.** Για να αποφασίζετε με σιγουριά και να νιώθετε σταθερότητα.\n- **Μικρά βήματα, πραγματική αλλαγή.** Πρακτικές κινήσεις που αντέχουν στον χρόνο.\n\n### Για τι θέματα μπορώ να βοηθήσω\n\n- άγχος, πίεση, υπερφόρτωση  \n- δυσκολίες στις σχέσεις και στα όρια  \n- χαμηλή αυτοεκτίμηση και εσωτερική σύγχυση  \n- κρίσεις, αλλαγές, “μπλοκαρίσματα”\n\n> Στόχος: περισσότερη ηρεμία, καθαρότητα και μια ζωή που σας ταιριάζει.\n",
+          "media": {
+            "avatarUrls": [
+              "/uploads/avatar-1.webp",
+              "/uploads/avatar-2.webp",
+              "/uploads/avatar-3.webp"
+            ],
+            "diplomaUrl": "/uploads/diploma.webp"
+          }
+        },
+        "services": {
+          "title": "Υπηρεσίες",
+          "subtitle": "Κάνε κλικ σε μια κάρτα για να δεις όλες τις λεπτομέρειες."
+        },
+        "cta": {
+          "title": "Έτοιμοι να ξεκινήσουμε;",
+          "bodyMd": "Αν νιώθετε ότι κάτι “μπλοκάρει”, μπορούμε να το ξεκαθαρίσουμε μαζί.  \nΣτην πρώτη συνεδρία βάζουμε στόχο και επιλέγουμε τα επόμενα βήματα, με απλότητα και ασφάλεια.\n",
+          "buttonText": "Επικοινωνία",
+          "buttonHref": "#footer"
+        },
+        "footer": {
+          "title": "Επικοινωνία",
+          "bodyMd": "Email: **hello@backtoyou.local**\n\nInstagram: **@backtoyou**\n\nAddress: Athens (demo)"
+        }
+      },
+      "services": [
+        {
+          "id": "svc_1",
+          "title": "Δωρεάν Διαγνωστική Συνεδρία (20–30 λεπτά)",
+          "shortMd": "είναι το πρώτο σας βήμα προς την αλλαγή.\nΚατά τη διάρκεια της συνεδρίας θα συζητήσουμε την τρέχουσα κατάστασή σας, θα εντοπίσουμε τα βασικά σημεία και θα ξεκαθαρίσουμε πώς μπορώ να σας βοηθήσω να πετύχετε τα αποτελέσματα που επιθυμείτε.",
+          "fullMd": "Θα αποκτήσετε καθαρή εικόνα για όσα σας απασχολούν και θα γνωρίζετε πώς να προχωρήσετε. Η συνεδρία είναι εντελώς δωρεάν και χωρίς καμία υποχρέωση, ώστε να δείτε πώς λειτουργεί η προσέγγισή μου και αν σας ταιριάζει.\n",
+          "price": "€10",
+          "imageUrl": "/uploads/service-svc_1.webp"
+        },
+        {
+          "id": "svc_2",
+          "title": "Προσωπική υποστήριξη και εργασία με το υποσυνείδητο",
+          "shortMd": "\n\nΑν νιώθετε ότι έχετε κολλήσει, ότι κουραστήκατε να παλεύετε μόνοι σας και δεν ξέρετε προς τα πού να κινηθείτε, τότε δεν χρειάζεστε άλλη μία «γενική συζήτηση».\nΧρειάζεστε υποστήριξη, δομή και έναν άνθρωπο δίπλα σας που θα σας καθοδηγήσει μέσα σε αυτή την περίοδο.\nΓι’ αυτό ακριβώς δημιουργήθηκε αυτό το πρόγραμμα συνοδείας.\n\nΤι θα λάβετε:",
+          "fullMd": "\n✔ 4 ατομικές συνεδρίες (120 λεπτά η καθεμία)\nOnline ή δια ζώσης. Δουλεύουμε βαθιά και στοχευμένα πάνω στο θέμα σας, με αποτελεσματικές τεχνικές δουλειάς με το υποσυνείδητο.\n\n✔ Υποστήριξη ανάμεσα στις συνεδρίες\nΓια έναν μήνα μπορείτε να μου στέλνετε φωνητικά μηνύματα τις καθημερινές, ώστε να μη μένετε μόνοι με άγχος, αμφιβολίες και δύσκολες συναισθηματικές καταστάσεις.\n\n✔ Πλήρης καθοδήγηση από το Α έως το Ω\nΔεν σας αφήνω μόνους ανάμεσα στις συναντήσεις. Σας καθοδηγώ βήμα-βήμα προς σταθερή αλλαγή, όχι απλώς προσωρινή ανακούφιση.\n\n✔ Εξατομικευμένες ασκήσεις και διαλογισμοί\nΕπιλεγμένα ειδικά για εσάς, ώστε το αποτέλεσμα να εδραιώνεται και να συνεχίζει να λειτουργεί στην καθημερινότητά σας.\n\nΑυτό το πρόγραμμα είναι για εσάς αν:\n\nνιώθετε εσωτερική σύγχυση και εξάντληση\n\nπερνάτε κρίση ή μια δύσκολη φάση ζωής\n\nέχετε χάσει το «στήριγμά» σας και το νόημα\n\nβγαίνετε από επώδυνες ή καταστροφικές σχέσεις\n\nνιώθετε ότι «δεν πάει άλλο», αλλά δεν ξέρετε από πού να ξεκινήσετε\n\nΣτόχος μου είναι να σας βοηθήσω να βγείτε από την κρίση και να ξαναχτίσετε εσωτερική σταθερότητα, όχι απλώς να «μιλήσουμε».\nΘα λάβετε ξεκάθαρη καθοδήγηση, υποστήριξη και βαθιά δουλειά με τις αιτίες όσων συμβαίνουν στη ζωή σας.\n\nBonus για εσάς\n\nΠριν ξεκινήσουμε, λαμβάνετε ΔΩΡΕΑΝ διαγνωστική συνεδρία, όπου θα:\n\nξεκαθαρίσουμε το αίτημά σας\n\nδούμε αν αυτό το πρόγραμμα σας ταιριάζει\n\nσυμφωνήσουμε όλες τις λεπτομέρειες της συνεργασίας\n\nΔιάρκεια προγράμματος: 1 μήνας.\n\n📌 Αν το νιώθετε μέσα σας, μην το αναβάλλετε.\nΌσο περισσότερο μένετε σε κρίση, τόσο περισσότερη δύναμη σας παίρνει.\nΜερικές φορές μία σωστή απόφαση και η σωστή υποστήριξη μπορούν να αλλάξουν τα πάντα.\n\n👉 Κλείστε τη δωρεάν διαγνωστική συνεδρία και κάντε το πρώτο βήμα προς την αλλαγή σήμερα.",
+          "price": "€250",
+          "imageUrl": "/uploads/service-svc_2.webp"
+        },
+        {
+          "id": "svc_3",
+          "title": "Εντατική υπνοθεραπευτική υποστήριξη με εξατομικευμένο πρόγραμμα",
+          "shortMd": "Αν χρειάζεστε μια βαθιά μεταμόρφωση με επιστημονικά τεκμηριωμένες μεθόδους, αναδρομική θεραπεία και εξατομικευμένη προσέγγιση, αυτό το πακέτο είναι για εσάς.",
+          "fullMd": "\nΤι σας περιμένει:\n✔ 4 εντατικές συνεδρίες υπνοθεραπείας διάρκειας 2,5 ωρών\nOnline ή δια ζώσης, με εφαρμογή EMDR, NLP και αναδρομικών τεχνικών, προσαρμοσμένων στα δικά σας ζητήματα.\n✔ Εξατομικευμένη προσέγγιση και πρόοδος\nΤο πρόγραμμα δημιουργείται ειδικά για εσάς, ώστε να βλέπετε πραγματικές αλλαγές.\n✔ Υποστήριξη με φωνητικά μηνύματα (εκτός Σαββατοκύριακου)\nΜπορείτε να στέλνετε φωνητικά μηνύματα οποιαδήποτε στιγμή και θα απαντώ τις εργάσιμες ημέρες, σε χρόνο που με εξυπηρετεί.\n\nΓια ποιον είναι αυτό το πακέτο\nΑν είστε έτοιμοι για βαθιά δουλειά με το υποσυνείδητο και θέλετε να διανύσετε αυτή τη διαδρομή με υποστήριξη και ξεκάθαρη δομή, αυτή η επιλογή είναι για εσάς.\n\n👉 Κλείστε μια δωρεάν διαγνωστική συμβουλευτική συνεδρία και ξεκινήστε το ταξίδι σας προς την αλλαγή από σήμερα.",
+          "price": "€350",
+          "imageUrl": "/uploads/service-svc_3.webp"
+        }
+      ]
+    }
+  }
+}

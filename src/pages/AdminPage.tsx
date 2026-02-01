@@ -5,16 +5,12 @@ import type { ContentBundle, ContentModel, Locale, ServiceCard } from "../app/ty
 import { Card, Button, Input, Textarea, Label, Hint } from "../app/AppShell";
 import { mdToSafeHtml } from "../app/md";
 import { isLocale } from "../app/locale";
-import Cropper, { type Area } from "react-easy-crop";
-import { cropToDataUrl, fileToDataUrl } from "../app/image";
 
 type SetBundleResult = { ok: true } | { ok: false; reason: string; status?: number; details?: unknown };
 
 /** FE: Simple Markdown editor with toolbar + live preview. */
 function MdEditor(props: { label: string; value: string; onChange: (v: string) => void; hint?: string; rows?: number }) {
     const html = useMemo(() => mdToSafeHtml(props.value), [props.value]);
-
-    // FE: Use native textarea to avoid React "ref" warning if AppShell.Textarea is not forwardRef.
     const taRef = useRef<HTMLTextAreaElement | null>(null);
 
     function applyEdit(
@@ -26,7 +22,6 @@ function MdEditor(props: { label: string; value: string; onChange: (v: string) =
         const { next, nextSelStart, nextSelEnd } = edit(props.value, el.selectionStart ?? 0, el.selectionEnd ?? 0);
         props.onChange(next);
 
-        // FE: Restore selection after React updates the value.
         requestAnimationFrame(() => {
             const el2 = taRef.current;
             if (!el2) return;
@@ -42,7 +37,6 @@ function MdEditor(props: { label: string; value: string; onChange: (v: string) =
             const after = current.slice(e);
 
             const next = before + left + (mid || "text") + right + after;
-
             const selStart = s + left.length;
             const selEnd = selStart + (mid || "text").length;
             return { next, nextSelStart: selStart, nextSelEnd: selEnd };
@@ -77,7 +71,6 @@ function MdEditor(props: { label: string; value: string; onChange: (v: string) =
             const link = `[${mid}](https://example.com)`;
             const next = before + link + after;
 
-            // FE: Select URL part for quick replace.
             const urlStart = before.length + link.indexOf("https://");
             const urlEnd = before.length + link.length - 1;
             return { next, nextSelStart: urlStart, nextSelEnd: urlEnd };
@@ -142,156 +135,39 @@ function MdEditor(props: { label: string; value: string; onChange: (v: string) =
     );
 }
 
-/** FE: Download helper (for static sites: user saves into /public/uploads manually). */
-function downloadDataUrl(dataUrl: string, filename: string) {
-    const a = document.createElement("a");
-    a.href = dataUrl;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+// ===== FE: Hard rule - do NOT allow inline/base64 images in KV =====
+
+function hasInlineDataUrl(v: unknown): boolean {
+    if (typeof v !== "string") return false;
+    return v.trim().toLowerCase().startsWith("data:image/");
 }
 
-/** FE: Modal cropper to produce a resized data URL. */
-function ImageCropModal(props: {
-    open: boolean;
-    imageSrc: string;
-    aspect: number;
-    title: string;
-    onCancel: () => void;
-    onSave: (dataUrl: string) => void;
-}) {
-    const [crop, setCrop] = useState({ x: 0, y: 0 });
-    const [zoom, setZoom] = useState(1);
-    const [cropPixels, setCropPixels] = useState<Area | null>(null);
-    const [outWidth, setOutWidth] = useState(1200);
-    const [mimeType, setMimeType] = useState<"image/webp" | "image/jpeg">("image/webp");
+function assertNoInlineImages(b: ContentBundle) {
+    const locales = Object.keys(b.content) as Array<keyof ContentBundle["content"]>;
 
-    if (!props.open) return null;
+    for (const l of locales) {
+        const m: any = (b.content as any)[l];
+        if (!m) continue;
 
-    async function save() {
-        if (!cropPixels) return;
-        const dataUrl = await cropToDataUrl({
-            imageSrc: props.imageSrc,
-            cropPixels,
-            outWidth,
-            mimeType,
-            quality: mimeType === "image/webp" ? 0.86 : 0.9,
-        });
-        props.onSave(dataUrl);
+        if (hasInlineDataUrl(m.blocks?.hero?.imageUrl)) throw new Error(`Inline image in hero.imageUrl (${String(l)})`);
+
+        const media = m.blocks?.about?.media;
+        if (media?.avatarUrls?.some(hasInlineDataUrl)) throw new Error(`Inline image in about.media.avatarUrls (${String(l)})`);
+        if (hasInlineDataUrl(media?.diplomaUrl)) throw new Error(`Inline image in about.media.diplomaUrl (${String(l)})`);
+
+        if (m.services?.some((s: any) => hasInlineDataUrl(s.imageUrl))) throw new Error(`Inline image in services[].imageUrl (${String(l)})`);
     }
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/50" onClick={props.onCancel} />
-            <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-soft border border-zinc-200 overflow-hidden">
-                <div className="p-4 border-b border-zinc-200 flex items-center justify-between">
-                    <div className="font-semibold">{props.title}</div>
-                    <Button type="button" variant="ghost" onClick={props.onCancel}>
-                        Close
-                    </Button>
-                </div>
-
-                <div className="p-4 grid md:grid-cols-[1fr,280px] gap-4">
-                    <div className="relative bg-zinc-100 rounded-2xl overflow-hidden min-h-[360px]">
-                        <Cropper
-                            image={props.imageSrc}
-                            crop={crop}
-                            zoom={zoom}
-                            aspect={props.aspect}
-                            onCropChange={setCrop}
-                            onZoomChange={setZoom}
-                            onCropComplete={(_, area) => setCropPixels(area)}
-                        />
-                    </div>
-
-                    <div className="space-y-3">
-                        <div>
-                            <Label>Zoom</Label>
-                            <input
-                                className="w-full"
-                                type="range"
-                                min={1}
-                                max={3}
-                                step={0.01}
-                                value={zoom}
-                                onChange={(e) => setZoom(Number(e.target.value))}
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>
-                                <Label>Output width</Label>
-                                <select
-                                    className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
-                                    value={outWidth}
-                                    onChange={(e) => setOutWidth(Number(e.target.value))}
-                                >
-                                    <option value={900}>900px</option>
-                                    <option value={1200}>1200px</option>
-                                    <option value={1400}>1400px</option>
-                                    <option value={1600}>1600px</option>
-                                </select>
-                                <div className="mt-1 text-xs text-zinc-500">Bigger = heavier export.</div>
-                            </div>
-                            <div>
-                                <Label>Format</Label>
-                                <select
-                                    className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
-                                    value={mimeType}
-                                    onChange={(e) => setMimeType(e.target.value as any)}
-                                >
-                                    <option value="image/webp">WebP (recommended)</option>
-                                    <option value="image/jpeg">JPEG</option>
-                                </select>
-                                <div className="mt-1 text-xs text-zinc-500">WebP usually smaller.</div>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-2 pt-2">
-                            <Button type="button" onClick={save} disabled={!cropPixels}>
-                                Use image
-                            </Button>
-                            <Button type="button" variant="ghost" onClick={props.onCancel}>
-                                Cancel
-                            </Button>
-                        </div>
-
-                        <div className="text-xs text-zinc-500">
-                            For static: we’ll download the cropped file, you put it into <code>public/uploads</code>, and JSON will store{" "}
-                            <code>/uploads/...</code>.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
 }
 
-/**
- * FE: “Static upload” field:
- * - Pick file, crop, download result as /public/uploads/<name>.webp
- * - Save JSON value as /uploads/<name>.webp
- */
-function PublicUploadsImageField(props: {
+/** FE: Select-only image field (no upload, no crop, no base64). */
+function SelectExistingImageField(props: {
     label: string;
     value: string;
     onChange: (v: string) => void;
-    aspect: number;
-    title: string;
-    uploadFileName: string;
+    options: Array<{ label: string; value: string }>;
     hint?: React.ReactNode;
 }) {
-    const fileRef = useRef<HTMLInputElement | null>(null);
-    const [cropOpen, setCropOpen] = useState(false);
-    const [src, setSrc] = useState<string>("");
-
-    async function onPickFile(file?: File) {
-        if (!file) return;
-        const dataUrl = await fileToDataUrl(file);
-        setSrc(dataUrl);
-        setCropOpen(true);
-    }
+    const [inlineErr, setInlineErr] = useState<string>("");
 
     return (
         <div>
@@ -299,40 +175,54 @@ function PublicUploadsImageField(props: {
                 <div>
                     <Label>{props.label}</Label>
                     <Hint>
-                        {props.hint ? (
-                            props.hint
-                        ) : (
+                        {props.hint ?? (
                             <>
-                                Saved as <code>/uploads/{props.uploadFileName}</code> (put file in <code>public/uploads</code>).
+                                Pick an existing file from <code>public/uploads</code> (stored as <code>/uploads/...</code>).
                             </>
                         )}
                     </Hint>
                 </div>
-                <div className="flex gap-2">
-                    <input
-                        ref={fileRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => void onPickFile(e.target.files?.[0])}
-                    />
-                    <Button type="button" variant="ghost" className="px-3 py-1.5 text-xs" onClick={() => fileRef.current?.click()}>
-                        Upload…
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        className="px-3 py-1.5 text-xs"
-                        onClick={() => props.onChange("")}
-                        disabled={!props.value}
-                        title="Remove image"
-                    >
-                        Clear
-                    </Button>
-                </div>
+
+                <Button
+                    type="button"
+                    variant="ghost"
+                    className="px-3 py-1.5 text-xs"
+                    onClick={() => {
+                        setInlineErr("");
+                        props.onChange("");
+                    }}
+                    disabled={!props.value}
+                    title="Remove image"
+                >
+                    Clear
+                </Button>
             </div>
 
-            <Input value={props.value} onChange={(e) => props.onChange(e.target.value)} className="mt-1" placeholder={`/uploads/${props.uploadFileName}`} />
+            <select
+                className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm bg-white"
+                value={props.value}
+                onChange={(e) => {
+                    const v = e.target.value ?? "";
+                    const vv = v.trim().toLowerCase();
+
+                    if (vv.startsWith("data:image/")) {
+                        setInlineErr("Inline/base64 images are not allowed. Store only /uploads/... paths.");
+                        return;
+                    }
+
+                    setInlineErr("");
+                    props.onChange(v);
+                }}
+            >
+                <option value="">(none)</option>
+                {props.options.map((o) => (
+                    <option key={o.value} value={o.value}>
+                        {o.label}
+                    </option>
+                ))}
+            </select>
+
+            {inlineErr ? <div className="mt-1 text-xs text-red-700">{inlineErr}</div> : null}
 
             {props.value ? (
                 <div className="mt-2 rounded-2xl border border-zinc-200 bg-zinc-50 overflow-hidden">
@@ -341,23 +231,6 @@ function PublicUploadsImageField(props: {
             ) : (
                 <div className="mt-2 text-xs text-zinc-500">No image selected.</div>
             )}
-
-            <ImageCropModal
-                open={cropOpen}
-                imageSrc={src}
-                aspect={props.aspect}
-                title={props.title}
-                onCancel={() => setCropOpen(false)}
-                onSave={(dataUrl) => {
-                    // FE: Download cropped result for /public/uploads
-                    downloadDataUrl(dataUrl, props.uploadFileName);
-
-                    // FE: Store stable public path in JSON
-                    props.onChange(`/uploads/${props.uploadFileName}`);
-
-                    setCropOpen(false);
-                }}
-            />
         </div>
     );
 }
@@ -372,6 +245,8 @@ function ServiceEditor(props: {
     canMoveDown: boolean;
     onMoveUp: () => void;
     onMoveDown: () => void;
+
+    imageOptions: Array<{ label: string; value: string }>;
 }) {
     return (
         <Card className="p-5">
@@ -426,16 +301,14 @@ function ServiceEditor(props: {
                 </div>
 
                 <div>
-                    <PublicUploadsImageField
+                    <SelectExistingImageField
                         label="Image"
                         value={props.svc.imageUrl ?? ""}
                         onChange={(v) => props.onSharedPatchAllLocales(props.svc.id, { imageUrl: v })}
-                        aspect={4 / 3}
-                        title="Crop service image"
-                        uploadFileName={`service-${props.svc.id}.webp`}
+                        options={props.imageOptions}
                         hint={
                             <>
-                                Shared across languages. Saved as <code>/uploads/service-{props.svc.id}.webp</code> (put file in <code>public/uploads</code>).
+                                Shared across languages. Pick an existing <code>/uploads/...</code> path.
                             </>
                         }
                     />
@@ -477,18 +350,35 @@ export default function AdminPage() {
     const [err, setErr] = useState<string>("");
 
     const fileRef = useRef<HTMLInputElement | null>(null);
-
-    // FE: Debounced persistence to avoid race conditions while typing.
     const saveTimer = useRef<number | null>(null);
 
-    // FE: Save status
     const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
     const [saveMsg, setSaveMsg] = useState<string>("");
+
+    const IMAGE_OPTIONS: Array<{ label: string; value: string }> = [
+        { label: "Hero (hero.webp)", value: "/uploads/hero.webp" },
+        { label: "Avatar 1 (avatar-1.webp)", value: "/uploads/avatar-1.webp" },
+        { label: "Avatar 2 (avatar-2.webp)", value: "/uploads/avatar-2.webp" },
+        { label: "Avatar 3 (avatar-3.webp)", value: "/uploads/avatar-3.webp" },
+        { label: "Diploma (diploma.webp)", value: "/uploads/diploma.webp" },
+    ];
+
+    function serviceImageOptions(id: string): Array<{ label: string; value: string }> {
+        return [{ label: `service-${id}.webp`, value: `/uploads/service-${id}.webp` }, ...IMAGE_OPTIONS];
+    }
 
     function persistDebounced(next: ContentBundle) {
         if (saveTimer.current) window.clearTimeout(saveTimer.current);
 
         saveTimer.current = window.setTimeout(() => {
+            try {
+                assertNoInlineImages(next);
+            } catch (e: any) {
+                setSaveState("error");
+                setSaveMsg("Inline/base64 images are not allowed. Use only /uploads/... paths. " + String(e?.message ?? e));
+                return;
+            }
+
             setSaveState("saving");
             setSaveMsg("");
 
@@ -530,8 +420,6 @@ export default function AdminPage() {
         });
     }
 
-    // ========= Multi-locale helpers =========
-
     const SUPPORTED_LOCALES: Locale[] = ["en", "ru", "el"];
 
     function ensureLocale(b: ContentBundle, l: Locale): ContentModel {
@@ -572,7 +460,7 @@ export default function AdminPage() {
             const m = ensureLocale(b, l);
             const map = new Map((m.services ?? []).map((s) => [s.id, s] as const));
             const next = order.map((id) => map.get(id) ?? byId.get(id)).filter(Boolean) as ServiceCard[];
-            b.content[l] = { ...m, services: next };
+            (b.content as any)[l] = { ...m, services: next };
         }
     }
 
@@ -589,7 +477,7 @@ export default function AdminPage() {
             const m = ensureLocale(b, l);
             const map = new Map((m.services ?? []).map((s) => [s.id, s] as const));
             const next = orderIds.map((id) => map.get(id) ?? byId.get(id)).filter(Boolean) as ServiceCard[];
-            b.content[l] = { ...m, services: next };
+            (b.content as any)[l] = { ...m, services: next };
         }
     }
 
@@ -599,17 +487,19 @@ export default function AdminPage() {
                 const next = JSON.parse(JSON.stringify(b)) as ContentBundle;
                 normalizeServicesAcrossLocales(next);
 
-                // FE: Try to persist normalized state once. If not authorized, ignore.
-                void Api.setBundle(next).catch(() => void 0);
+                try {
+                    assertNoInlineImages(next);
+                    void Api.setBundle(next).catch(() => void 0);
+                } catch {
+                    // ignore
+                }
 
                 setBundle(next);
                 setModel(next.content[locale] ?? next.content[next.defaultLocale]);
             })
-            .catch((e) => setErr(String(e?.message ? e.message : e)));
+            .catch((e) => setErr(String(e?.message ?? e)));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [locale]);
-
-    // ========= Patch helpers =========
 
     function patchSite(patch: Partial<ContentModel["site"]>) {
         mutateBundle((b) => {
@@ -636,7 +526,7 @@ export default function AdminPage() {
         mutateBundle((b) => {
             for (const l of SUPPORTED_LOCALES) {
                 const m = ensureLocale(b, l);
-                b.content[l] = { ...m, blocks: { ...m.blocks, hero: { ...m.blocks.hero, imageUrl } } };
+                (b.content as any)[l] = { ...m, blocks: { ...m.blocks, hero: { ...m.blocks.hero, imageUrl } } };
             }
         });
     }
@@ -645,9 +535,9 @@ export default function AdminPage() {
         mutateBundle((b) => {
             for (const l of SUPPORTED_LOCALES) {
                 const m = ensureLocale(b, l);
-                const current = m.blocks.about.media ?? {};
+                const current = (m.blocks.about as any).media ?? {};
                 const nextMedia = { ...current, ...patch };
-                b.content[l] = { ...m, blocks: { ...m.blocks, about: { ...m.blocks.about, media: nextMedia } } };
+                (b.content as any)[l] = { ...m, blocks: { ...m.blocks, about: { ...m.blocks.about, media: nextMedia } } };
             }
         });
     }
@@ -673,8 +563,6 @@ export default function AdminPage() {
         });
     }
 
-    // ========= Services =========
-
     function addService() {
         mutateBundle((b) => {
             const id = crypto.randomUUID().slice(0, 10);
@@ -696,8 +584,7 @@ Full description…`
                     imageUrl: "",
                 };
 
-                // FE: Append to END.
-                b.content[l] = { ...m, services: [...(m.services ?? []), svc] };
+                (b.content as any)[l] = { ...m, services: [...(m.services ?? []), svc] };
             }
 
             normalizeServicesAcrossLocales(b);
@@ -717,7 +604,7 @@ Full description…`
         mutateBundle((b) => {
             for (const l of SUPPORTED_LOCALES) {
                 const m = ensureLocale(b, l);
-                b.content[l] = { ...m, services: (m.services ?? []).filter((s) => s.id !== id) };
+                (b.content as any)[l] = { ...m, services: (m.services ?? []).filter((s) => s.id !== id) };
             }
             normalizeServicesAcrossLocales(b);
         });
@@ -757,20 +644,17 @@ Full description…`
                 if (idx >= 0) {
                     nextServices = list.map((s) => (s.id === serviceId ? { ...s, ...patch } : s));
                 } else if (sourceSvc) {
-                    // FE: Append (not prepend) to avoid unexpected reorders.
                     nextServices = [...list, { ...sourceSvc, ...patch }];
                 } else {
                     nextServices = list;
                 }
 
-                b.content[l] = { ...m, services: nextServices };
+                (b.content as any)[l] = { ...m, services: nextServices };
             }
 
             normalizeServicesAcrossLocales(b);
         });
     }
-
-    // ========= Import/Export =========
 
     function exportBundle() {
         if (!bundle) return;
@@ -791,6 +675,7 @@ Full description…`
         const next = JSON.parse(text) as ContentBundle;
 
         normalizeServicesAcrossLocales(next);
+        assertNoInlineImages(next);
 
         const r = await Api.setBundle(next);
         if (r && typeof r === "object" && "ok" in r) {
@@ -801,8 +686,6 @@ Full description…`
         setBundle(next);
         setModel(next.content[locale] ?? next.content[next.defaultLocale]);
     }
-
-    // ========= Render guards =========
 
     if (err) {
         return (
@@ -823,20 +706,13 @@ Full description…`
 
     const { site, blocks } = model;
 
-    const highlights = (blocks.about.highlights ?? ["", "", ""]).concat(["", "", ""]).slice(0, 3);
-    const avatarUrls = (blocks.about.media?.avatarUrls ?? ["", "", ""]).concat(["", "", ""]).slice(0, 3);
-    const diplomaUrl = blocks.about.media?.diplomaUrl ?? "";
+    const highlights = ((blocks as any).about?.highlights ?? ["", "", ""]).concat(["", "", ""]).slice(0, 3);
+    const avatarUrls = ((blocks as any).about?.media?.avatarUrls ?? ["", "", ""]).concat(["", "", ""]).slice(0, 3);
+    const diplomaUrl = (blocks as any).about?.media?.diplomaUrl ?? "";
 
     const saveBadge = saveState === "saving" ? "Saving…" : saveState === "saved" ? "Saved" : saveState === "error" ? "Save error" : "";
-
     const saveBadgeClass =
-        saveState === "saving"
-            ? "text-zinc-600"
-            : saveState === "saved"
-                ? "text-green-700"
-                : saveState === "error"
-                    ? "text-red-700"
-                    : "text-zinc-400";
+        saveState === "saving" ? "text-zinc-600" : saveState === "saved" ? "text-green-700" : saveState === "error" ? "text-red-700" : "text-zinc-400";
 
     return (
         <div className="space-y-6">
@@ -897,7 +773,6 @@ Full description…`
 
             <Card className="p-6 space-y-4">
                 <div className="text-lg font-semibold">Site</div>
-
                 <div className="grid md:grid-cols-2 gap-4">
                     <div>
                         <Label>Brand</Label>
@@ -918,21 +793,18 @@ Full description…`
                         <Label>Title</Label>
                         <Input value={blocks.hero.title} onChange={(e) => patchHero({ title: e.target.value })} className="mt-1" />
                     </div>
-                    <div>
-                        <PublicUploadsImageField
-                            label="Hero image"
-                            value={blocks.hero.imageUrl ?? ""}
-                            onChange={(v) => patchHeroImageAllLocales(v)}
-                            aspect={16 / 9}
-                            title="Crop hero image"
-                            uploadFileName="hero.webp"
-                            hint={
-                                <>
-                                    Shared across languages. Saved as <code>/uploads/hero.webp</code> (put file in <code>public/uploads</code>).
-                                </>
-                            }
-                        />
-                    </div>
+
+                    <SelectExistingImageField
+                        label="Hero image"
+                        value={blocks.hero.imageUrl ?? ""}
+                        onChange={(v) => patchHeroImageAllLocales(v)}
+                        options={IMAGE_OPTIONS}
+                        hint={
+                            <>
+                                Shared across languages. Stored as <code>/uploads/...</code> only.
+                            </>
+                        }
+                    />
                 </div>
 
                 <div>
@@ -993,19 +865,18 @@ Full description…`
                 <div className="pt-2">
                     <div className="text-sm font-semibold text-zinc-900">About media (3 circles + diploma)</div>
                     <div className="text-xs text-zinc-500 mt-1">
-                        Upload → crop → file downloads → put it into <code>public/uploads</code> → JSON stores <code>/uploads/...</code>.
-                        <span className="ml-2 font-medium text-zinc-700">Shared across languages.</span>
+                        Select existing images. No uploads here. Stored as <code>/uploads/...</code>. Shared across languages.
                     </div>
 
                     <div className="grid lg:grid-cols-2 gap-4 mt-4">
                         <Card className="p-5">
                             <div className="font-semibold">Circle photos</div>
-                            <div className="text-xs text-zinc-500 mt-1">Aspect 1:1, rendered as circles on the Home page.</div>
+                            <div className="text-xs text-zinc-500 mt-1">Rendered as circles on the Home page.</div>
 
                             <div className="grid md:grid-cols-3 gap-3 mt-4">
                                 {[0, 1, 2].map((i) => (
                                     <div key={i}>
-                                        <PublicUploadsImageField
+                                        <SelectExistingImageField
                                             label={`Avatar ${i + 1}`}
                                             value={avatarUrls[i] ?? ""}
                                             onChange={(v) => {
@@ -1013,15 +884,7 @@ Full description…`
                                                 next[i] = v;
                                                 patchAboutMediaAllLocales({ avatarUrls: next });
                                             }}
-                                            aspect={1}
-                                            title={`Crop avatar ${i + 1}`}
-                                            uploadFileName={`avatar-${i + 1}.webp`}
-                                            hint={
-                                                <>
-                                                    Shared across languages. Saved as <code>/uploads/avatar-{i + 1}.webp</code> (put file in{" "}
-                                                    <code>public/uploads</code>).
-                                                </>
-                                            }
+                                            options={IMAGE_OPTIONS}
                                         />
                                     </div>
                                 ))}
@@ -1030,21 +893,14 @@ Full description…`
 
                         <Card className="p-5">
                             <div className="font-semibold">Diploma</div>
-                            <div className="text-xs text-zinc-500 mt-1">Square image (1:1). Looks best as clean document/photo.</div>
+                            <div className="text-xs text-zinc-500 mt-1">Square image (1:1) recommended.</div>
 
                             <div className="mt-4">
-                                <PublicUploadsImageField
+                                <SelectExistingImageField
                                     label="Diploma image"
                                     value={diplomaUrl}
                                     onChange={(v) => patchAboutMediaAllLocales({ diplomaUrl: v })}
-                                    aspect={1}
-                                    title="Crop diploma"
-                                    uploadFileName="diploma.webp"
-                                    hint={
-                                        <>
-                                            Shared across languages. Saved as <code>/uploads/diploma.webp</code> (put file in <code>public/uploads</code>).
-                                        </>
-                                    }
+                                    options={IMAGE_OPTIONS}
                                 />
                             </div>
                         </Card>
@@ -1086,6 +942,7 @@ Full description…`
                             canMoveDown={i < (model.services ?? []).length - 1}
                             onMoveUp={() => moveServiceAllLocales(s.id, -1)}
                             onMoveDown={() => moveServiceAllLocales(s.id, +1)}
+                            imageOptions={serviceImageOptions(s.id)}
                         />
                     ))}
                 </div>

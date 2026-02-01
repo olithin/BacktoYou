@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { localeFromPathname, swapLocaleInPathname } from "./locale";
 
@@ -6,7 +6,6 @@ function WhatsAppNeoIcon() {
     return (
         <span className="vv-neoMark vv-wa" aria-hidden="true">
             <span className="vv-neoMarkInner vv-waInner">
-                {/* Simplified WhatsApp mark (clean + readable at small size) */}
                 <svg viewBox="0 0 24 24" className="vv-neoSvg" aria-hidden="true">
                     <path
                         fill="currentColor"
@@ -22,7 +21,6 @@ function ViberNeoIcon() {
     return (
         <span className="vv-neoMark vv-vb" aria-hidden="true">
             <span className="vv-neoMarkInner vv-vbInner">
-                {/* Simplified Viber mark */}
                 <svg viewBox="0 0 24 24" className="vv-neoSvg" aria-hidden="true">
                     <path
                         fill="currentColor"
@@ -54,9 +52,137 @@ export default function Layout(props: { children: React.ReactNode }) {
 
     const ctaText = locale === "el" ? "Κλείσε συνεδρία" : locale === "ru" ? "Записаться" : "Book a session";
 
+    // FE: Keep CSS stable between renders.
+    const css = useMemo(
+        () => `
+            .vv-bgOverlay {
+                position: relative;
+                isolation: isolate;
+            }
+            .vv-bgOverlay::before{
+                content:"";
+                position:absolute;
+                inset:0;
+                background: radial-gradient(1200px 800px at 15% 10%, rgba(255,255,255,0.78), rgba(255,255,255,0.58) 45%, rgba(255,255,255,0.42) 70%, rgba(255,255,255,0.30));
+                pointer-events:none;
+                z-index:-1;
+            }
+
+            /* FE: iOS/Safari tends to hate background-attachment: fixed */
+            @media (max-width: 768px) {
+                .vv-bgFixed { background-attachment: scroll !important; }
+            }
+
+            @keyframes vvBreathe {
+                0%   { transform: translateY(0px) scale(1); }
+                50%  { transform: translateY(-2px) scale(1.02); }
+                100% { transform: translateY(0px) scale(1); }
+            }
+
+            .vv-breathe {
+                animation: vvBreathe 3.4s ease-in-out infinite;
+                animation-delay: var(--vv-delay, 0ms);
+                will-change: transform;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                .vv-breathe { animation: none !important; }
+            }
+
+            /* ===== Neomorphic pill buttons ===== */
+            .vv-neoPill {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 14px;
+                border-radius: 9999px;
+                background: rgba(245,246,248,0.78);
+                border: 1px solid rgba(17,24,39,0.08);
+                box-shadow:
+                    10px 10px 22px rgba(17,24,39,0.10),
+                    -10px -10px 22px rgba(255,255,255,0.85),
+                    inset 1px 1px 0 rgba(255,255,255,0.65),
+                    inset -1px -1px 0 rgba(17,24,39,0.05);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+                user-select: none;
+            }
+            .vv-neoPill:hover{
+                transform: translateY(-1px);
+                box-shadow:
+                    14px 14px 28px rgba(17,24,39,0.12),
+                    -14px -14px 28px rgba(255,255,255,0.90),
+                    inset 1px 1px 0 rgba(255,255,255,0.72),
+                    inset -1px -1px 0 rgba(17,24,39,0.06);
+            }
+            .vv-neoPill:active{
+                transform: translateY(0px);
+                box-shadow:
+                    8px 8px 18px rgba(17,24,39,0.10),
+                    -8px -8px 18px rgba(255,255,255,0.80),
+                    inset 3px 3px 10px rgba(17,24,39,0.10),
+                    inset -3px -3px 10px rgba(255,255,255,0.70);
+            }
+
+            .vv-neoLabel {
+                font-size: 14px;
+                font-weight: 700;
+                color: rgba(17,24,39,0.86);
+                letter-spacing: -0.01em;
+                white-space: nowrap;
+            }
+
+            /* ===== Neomorphic icon blocks ===== */
+            .vv-neoMark{
+                width: 44px;
+                height: 44px;
+                display: grid;
+                place-items: center;
+                background: rgba(236,238,242,0.92);
+                border: 1px solid rgba(17,24,39,0.06);
+                box-shadow:
+                    8px 8px 16px rgba(17,24,39,0.12),
+                    -8px -8px 16px rgba(255,255,255,0.90),
+                    inset 1px 1px 0 rgba(255,255,255,0.65);
+            }
+            .vv-neoMarkInner{
+                width: 34px;
+                height: 34px;
+                display: grid;
+                place-items: center;
+                box-shadow:
+                    inset 3px 3px 10px rgba(17,24,39,0.18),
+                    inset -3px -3px 10px rgba(255,255,255,0.35);
+            }
+            .vv-neoSvg{
+                width: 22px;
+                height: 22px;
+                color: rgba(255,255,255,0.95);
+                filter: drop-shadow(0 1px 0 rgba(0,0,0,0.10));
+            }
+
+            /* WhatsApp: round */
+            .vv-wa{ border-radius: 9999px; }
+            .vv-waInner{
+                border-radius: 9999px;
+                background: linear-gradient(180deg, rgba(61,168,112,1), rgba(33,140,86,1));
+            }
+
+            /* Viber: rounded square */
+            .vv-vb{ border-radius: 16px; }
+            .vv-vbInner{
+                border-radius: 12px;
+                background: linear-gradient(180deg, rgba(126, 87, 194, 1), rgba(98, 63, 165, 1));
+            }
+        `,
+        []
+    );
+
     return (
         <div
-            className="min-h-screen"
+            className="min-h-screen vv-bgFixed"
             style={{
                 backgroundImage: "url(/bg-neomorph.png)",
                 backgroundSize: "cover",
@@ -64,125 +190,7 @@ export default function Layout(props: { children: React.ReactNode }) {
                 backgroundAttachment: "fixed",
             }}
         >
-            {/* FE: Overlay to keep readability over textured background */}
-            <style>{`
-                .vv-bgOverlay {
-                    position: relative;
-                    isolation: isolate;
-                }
-                .vv-bgOverlay::before{
-                    content:"";
-                    position:absolute;
-                    inset:0;
-                    background: radial-gradient(1200px 800px at 15% 10%, rgba(255,255,255,0.78), rgba(255,255,255,0.58) 45%, rgba(255,255,255,0.42) 70%, rgba(255,255,255,0.30));
-                    pointer-events:none;
-                    z-index:-1;
-                }
-
-                @keyframes vvBreathe {
-                    0%   { transform: translateY(0px) scale(1); }
-                    50%  { transform: translateY(-2px) scale(1.02); }
-                    100% { transform: translateY(0px) scale(1); }
-                }
-
-                .vv-breathe {
-                    animation: vvBreathe 3.4s ease-in-out infinite;
-                    animation-delay: var(--vv-delay, 0ms);
-                    will-change: transform;
-                }
-
-                @media (prefers-reduced-motion: reduce) {
-                    .vv-breathe { animation: none !important; }
-                }
-
-                /* ===== Neomorphic pill buttons ===== */
-                .vv-neoPill {
-                    position: relative;
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 10px;
-                    padding: 10px 14px;
-                    border-radius: 9999px;
-                    background: rgba(245,246,248,0.78);
-                    border: 1px solid rgba(17,24,39,0.08);
-                    box-shadow:
-                        10px 10px 22px rgba(17,24,39,0.10),
-                        -10px -10px 22px rgba(255,255,255,0.85),
-                        inset 1px 1px 0 rgba(255,255,255,0.65),
-                        inset -1px -1px 0 rgba(17,24,39,0.05);
-                    backdrop-filter: blur(10px);
-                    -webkit-backdrop-filter: blur(10px);
-                    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
-                    user-select: none;
-                }
-                .vv-neoPill:hover{
-                    transform: translateY(-1px);
-                    box-shadow:
-                        14px 14px 28px rgba(17,24,39,0.12),
-                        -14px -14px 28px rgba(255,255,255,0.90),
-                        inset 1px 1px 0 rgba(255,255,255,0.72),
-                        inset -1px -1px 0 rgba(17,24,39,0.06);
-                }
-                .vv-neoPill:active{
-                    transform: translateY(0px);
-                    box-shadow:
-                        8px 8px 18px rgba(17,24,39,0.10),
-                        -8px -8px 18px rgba(255,255,255,0.80),
-                        inset 3px 3px 10px rgba(17,24,39,0.10),
-                        inset -3px -3px 10px rgba(255,255,255,0.70);
-                }
-
-                .vv-neoLabel {
-                    font-size: 14px;
-                    font-weight: 700;
-                    color: rgba(17,24,39,0.86);
-                    letter-spacing: -0.01em;
-                    white-space: nowrap;
-                }
-
-                /* ===== Neomorphic icon blocks ===== */
-                .vv-neoMark{
-                    width: 44px;
-                    height: 44px;
-                    display: grid;
-                    place-items: center;
-                    background: rgba(236,238,242,0.92);
-                    border: 1px solid rgba(17,24,39,0.06);
-                    box-shadow:
-                        8px 8px 16px rgba(17,24,39,0.12),
-                        -8px -8px 16px rgba(255,255,255,0.90),
-                        inset 1px 1px 0 rgba(255,255,255,0.65);
-                }
-                .vv-neoMarkInner{
-                    width: 34px;
-                    height: 34px;
-                    display: grid;
-                    place-items: center;
-                    box-shadow:
-                        inset 3px 3px 10px rgba(17,24,39,0.18),
-                        inset -3px -3px 10px rgba(255,255,255,0.35);
-                }
-                .vv-neoSvg{
-                    width: 22px;
-                    height: 22px;
-                    color: rgba(255,255,255,0.95);
-                    filter: drop-shadow(0 1px 0 rgba(0,0,0,0.10));
-                }
-
-                /* WhatsApp: round */
-                .vv-wa{ border-radius: 9999px; }
-                .vv-waInner{
-                    border-radius: 9999px;
-                    background: linear-gradient(180deg, rgba(61,168,112,1), rgba(33,140,86,1));
-                }
-
-                /* Viber: rounded square */
-                .vv-vb{ border-radius: 16px; }
-                .vv-vbInner{
-                    border-radius: 12px;
-                    background: linear-gradient(180deg, rgba(126, 87, 194, 1), rgba(98, 63, 165, 1));
-                }
-            `}</style>
+            <style>{css}</style>
 
             <div className="vv-bgOverlay min-h-screen">
                 <header className="sticky top-0 z-10 bg-white/55 backdrop-blur border-b border-zinc-200/60">
@@ -192,10 +200,11 @@ export default function Layout(props: { children: React.ReactNode }) {
                             <a
                                 href={WHATSAPP_HREF}
                                 target="_blank"
-                                rel="noreferrer"
+                                rel="noreferrer noopener"
                                 className="vv-neoPill vv-breathe"
                                 style={{ ["--vv-delay" as any]: "0ms" }}
                                 title="WhatsApp"
+                                aria-label="Open WhatsApp chat"
                             >
                                 <WhatsAppNeoIcon />
                                 <span className="vv-neoLabel">{ctaText}</span>
@@ -206,6 +215,7 @@ export default function Layout(props: { children: React.ReactNode }) {
                                 className="vv-neoPill vv-breathe"
                                 style={{ ["--vv-delay" as any]: "220ms" }}
                                 title="Viber"
+                                aria-label="Open Viber chat"
                             >
                                 <ViberNeoIcon />
                                 <span className="vv-neoLabel">Viber</span>

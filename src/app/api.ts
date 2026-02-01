@@ -8,12 +8,14 @@ import { nanoid } from "nanoid";
  * - Fallback 2: /content.json (seed public asset).
  *
  * Auth:
- * - PUT is protected server-side by Cloudflare Access + ADMIN_EMAILS allowlist.
- * - No client tokens.
+ * - Prod: PUT is protected server-side by Cloudflare Access + ADMIN_EMAILS allowlist.
+ * - Dev: if DEV_BYPASS_AUTH="true" on server, client must send X-Dev-Admin-Token.
  */
 
 const LS_BUNDLE_KEY = "lada_content_bundle_v2_cache";
 const API_CONTENT_URL = "/api/content";
+const DEV_ADMIN_TOKEN = (import.meta as any)?.env?.VITE_DEV_ADMIN_TOKEN ? String((import.meta as any).env.VITE_DEV_ADMIN_TOKEN) : "";
+const DEV_TOKEN_HEADER = "X-Dev-Admin-Token";
 
 function jsonTry<T>(s: string | null): T | null {
     if (!s) return null;
@@ -58,25 +60,21 @@ function getOrInitLocale(bundle: ContentBundle, locale: Locale): ContentModel {
     const hit = bundle.content?.[locale];
     if (hit) return hit;
 
-    // FE: If locale missing, clone default as a starting point.
     const fallback = bundle.content[bundle.defaultLocale];
     const cloned = JSON.parse(JSON.stringify(fallback)) as ContentModel;
     bundle.content[locale] = cloned;
     return cloned;
 }
 
-type SetBundleResult =
-    | { ok: true }
-    | { ok: false; reason: string; status?: number; details?: unknown };
+type SetBundleResult = { ok: true } | { ok: false; reason: string; status?: number; details?: unknown };
 
 async function parseErrorBody(res: Response): Promise<string> {
     const txt = await res.text().catch(() => "");
     if (!txt) return res.statusText || `HTTP ${res.status}`;
 
-    // try json
     try {
         const j = JSON.parse(txt) as any;
-        if (j?.reason) return String(j.reason);
+        if (j?.reason) return String(j.reason);   // backend already returns "forbidden:..."
         if (j?.message) return String(j.message);
         if (j?.error) return String(j.error);
     } catch {
@@ -87,29 +85,29 @@ async function parseErrorBody(res: Response): Promise<string> {
 
 export const Api = {
     async getBundle(): Promise<ContentBundle> {
-        // FE: 1) Remote KV
         const remote = await loadRemoteBundle();
         if (remote) return remote;
 
-        // FE: 2) Local cache
         const cached = loadLocalBundleCache();
         if (cached) return cached;
 
-        // FE: 3) Seed (public asset)
         const seed = await loadSeedBundle();
         saveLocalBundleCache(seed);
         return seed;
     },
 
     async setBundle(bundle: ContentBundle): Promise<SetBundleResult> {
-        // FE: Always cache locally first (optimistic UI + offline fallback).
         saveLocalBundleCache(bundle);
 
         const text = JSON.stringify(bundle, null, 2);
 
+        const headers: Record<string, string> = { "content-type": "application/json" };
+        // Dev-only: send token if present
+        if (DEV_ADMIN_TOKEN) headers[DEV_TOKEN_HEADER] = DEV_ADMIN_TOKEN;
+
         const res = await fetch(API_CONTENT_URL, {
             method: "PUT",
-            headers: { "content-type": "application/json" },
+            headers,
             body: text,
         });
 
@@ -117,7 +115,8 @@ export const Api = {
             const details = await parseErrorBody(res);
             return {
                 ok: false,
-                reason: res.status === 403 ? `forbidden:${details}` : `http_${res.status}:${details}`,
+                // Keep server reason as-is when possible (it already uses "forbidden:*", "bad_request:*", etc.)
+                reason: details.startsWith("forbidden:") || details.startsWith("bad_request:") ? details : `http_${res.status}:${details}`,
                 status: res.status,
                 details,
             };
@@ -131,38 +130,6 @@ export const Api = {
         return getOrInitLocale(bundle, locale);
     },
 
-    // ===== Blocks / Site updates (per-locale) =====
-
-    async updateSite(locale: Locale, patch: Partial<ContentModel["site"]>): Promise<ContentModel["site"]> {
-        const bundle = await this.getBundle();
-        const model = getOrInitLocale(bundle, locale);
-        const next = { ...model.site, ...patch };
-        bundle.content[locale] = { ...model, site: next };
-        const r = await this.setBundle(bundle);
-        if (!r.ok) throw new Error(r.reason);
-        return next;
-    },
-
-    async updateHero(locale: Locale, patch: Partial<ContentModel["blocks"]["hero"]>): Promise<ContentModel["blocks"]["hero"]> {
-        const bundle = await this.getBundle();
-        const model = getOrInitLocale(bundle, locale);
-        const next = { ...model.blocks.hero, ...patch };
-        bundle.content[locale] = { ...model, blocks: { ...model.blocks, hero: next } };
-        const r = await this.setBundle(bundle);
-        if (!r.ok) throw new Error(r.reason);
-        return next;
-    },
-
-    async updateAbout(locale: Locale, patch: Partial<ContentModel["blocks"]["about"]>): Promise<ContentModel["blocks"]["about"]> {
-        const bundle = await this.getBundle();
-        const model = getOrInitLocale(bundle, locale);
-        const next = { ...model.blocks.about, ...patch };
-        bundle.content[locale] = { ...model, blocks: { ...model.blocks, about: next } };
-        const r = await this.setBundle(bundle);
-        if (!r.ok) throw new Error(r.reason);
-        return next;
-    },
-
     async updateServicesBlock(locale: Locale, patch: Partial<ContentModel["blocks"]["services"]>): Promise<ContentModel["blocks"]["services"]> {
         const bundle = await this.getBundle();
         const model = getOrInitLocale(bundle, locale);
@@ -172,28 +139,6 @@ export const Api = {
         if (!r.ok) throw new Error(r.reason);
         return next;
     },
-
-    async updateCta(locale: Locale, patch: Partial<ContentModel["blocks"]["cta"]>): Promise<ContentModel["blocks"]["cta"]> {
-        const bundle = await this.getBundle();
-        const model = getOrInitLocale(bundle, locale);
-        const next = { ...model.blocks.cta, ...patch };
-        bundle.content[locale] = { ...model, blocks: { ...model.blocks, cta: next } };
-        const r = await this.setBundle(bundle);
-        if (!r.ok) throw new Error(r.reason);
-        return next;
-    },
-
-    async updateFooter(locale: Locale, patch: Partial<ContentModel["blocks"]["footer"]>): Promise<ContentModel["blocks"]["footer"]> {
-        const bundle = await this.getBundle();
-        const model = getOrInitLocale(bundle, locale);
-        const next = { ...model.blocks.footer, ...patch };
-        bundle.content[locale] = { ...model, blocks: { ...model.blocks, footer: next } };
-        const r = await this.setBundle(bundle);
-        if (!r.ok) throw new Error(r.reason);
-        return next;
-    },
-
-    // ===== Services CRUD (per-locale) =====
 
     async addService(locale: Locale, draft?: Partial<ServiceCard>): Promise<ServiceCard> {
         const bundle = await this.getBundle();
@@ -215,36 +160,5 @@ export const Api = {
         if (!r.ok) throw new Error(r.reason);
 
         return svc;
-    },
-
-    async updateService(locale: Locale, id: string, patch: Partial<ServiceCard>): Promise<ServiceCard> {
-        const bundle = await this.getBundle();
-        const model = getOrInitLocale(bundle, locale);
-        const idx = (model.services ?? []).findIndex((s) => s.id === id);
-        if (idx === -1) throw new Error(`Service not found: ${id}`);
-
-        const updated: ServiceCard = { ...(model.services ?? [])[idx], ...patch, id };
-        const nextServices = [...(model.services ?? [])];
-        nextServices[idx] = updated;
-
-        const next: ContentModel = { ...model, services: nextServices };
-        bundle.content[locale] = next;
-
-        const r = await this.setBundle(bundle);
-        if (!r.ok) throw new Error(r.reason);
-
-        return updated;
-    },
-
-    async deleteService(locale: Locale, id: string): Promise<{ ok: true }> {
-        const bundle = await this.getBundle();
-        const model = getOrInitLocale(bundle, locale);
-        const next: ContentModel = { ...model, services: (model.services ?? []).filter((s) => s.id !== id) };
-        bundle.content[locale] = next;
-
-        const r = await this.setBundle(bundle);
-        if (!r.ok) throw new Error(r.reason);
-
-        return { ok: true };
     },
 };

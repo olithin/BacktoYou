@@ -29,12 +29,10 @@ export type ContentModel = {
         about: {
             title: string;
             bodyMd: string;
-
-            // NEW: optional “boutique” highlights + media assets
             highlights?: string[];
             media?: {
-                avatarUrls?: string[];   // length 3 recommended
-                diplomaUrl?: string;     // square image
+                avatarUrls?: string[];
+                diplomaUrl?: string;
             };
         };
         services: { title: string; subtitle: string };
@@ -43,7 +41,6 @@ export type ContentModel = {
     };
     services: ServiceCard[];
 };
-
 
 export type ContentBundle = {
     defaultLocale: Locale;

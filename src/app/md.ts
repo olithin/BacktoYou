@@ -3,7 +3,7 @@ import { marked } from "marked";
 
 marked.setOptions({
   breaks: true,
-  gfm: true
+  gfm: true,
 });
 
 export function mdToSafeHtml(md: string): string {

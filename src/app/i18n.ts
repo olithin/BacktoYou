@@ -1,3 +1,4 @@
+// src/app/i18n.ts
 import type { Locale } from "./types";
 
 const UI: Record<Locale, Record<string, string>> = {
@@ -6,22 +7,31 @@ const UI: Record<Locale, Record<string, string>> = {
     navAdmin: "Admin",
     loading: "Loading…",
     failed: "Failed to load content",
-    localNote: ""
+    localNote: "",
+    expand: "Expand",
+    collapse: "Collapse",
+    close: "Close",
   },
   ru: {
     navSite: "Сайт",
     navAdmin: "Админ",
     loading: "Загрузка…",
     failed: "Не удалось загрузить контент",
-    localNote: ""
+    localNote: "",
+    expand: "Развернуть",
+    collapse: "Свернуть",
+    close: "Закрыть",
   },
   el: {
     navSite: "Ιστότοπος",
     navAdmin: "Διαχείριση",
     loading: "Φόρτωση…",
     failed: "Αποτυχία φόρτωσης περιεχομένου",
-    localNote: ""
-  }
+    localNote: "",
+    expand: "Άνοιγμα",
+    collapse: "Κλείσιμο",
+    close: "Κλείσιμο",
+  },
 };
 
 export function t(locale: Locale, key: string): string {

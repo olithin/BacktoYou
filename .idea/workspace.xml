@@ -5,7 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6d0b432-56d5-45c0-ab0c-b4f8773b302c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/public/content.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/content.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/AppShell.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/AppShell.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/i18n.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/i18n.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/image.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/image.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/md.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/md.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/functions/api/content.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AdminPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AdminPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/vite.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,12 +79,17 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
     "ts.external.directory.path": "C:\\Repo\\Fix_Lada\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecapSpentCounter">
+    <option name="endsOfQuotaMs" value="1770696060729" />
+    <option name="spentUsd" value="0.09720031" />
+  </component>
   <component name="RecapUselessUpdatesCounter">
-    <option name="suspendCountdown" value="8" />
+    <option name="suspendCountdown" value="0" />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -81,7 +100,8 @@
       <updated>1767644642998</updated>
       <workItem from="1767644644109" duration="30737000" />
       <workItem from="1769253495949" duration="20180000" />
-      <workItem from="1769871073733" duration="1794000" />
+      <workItem from="1769871073733" duration="2890000" />
+      <workItem from="1769937523081" duration="19188000" />
     </task>
     <task id="LOCAL-00001" summary="fix project">
       <option name="closed" value="true" />
@@ -307,7 +327,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769872335139</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="fix">
+      <option name="closed" value="true" />
+      <created>1769872888786</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1769872888786</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -315,6 +343,17 @@
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="fix project" />

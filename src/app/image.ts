@@ -15,9 +15,9 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 export async function cropToDataUrl(opts: {
   imageSrc: string;
   cropPixels: Area;
-  outWidth: number;          // FE: Resize output to this width (keeps crop aspect)
+  outWidth: number;
   mimeType?: "image/webp" | "image/jpeg" | "image/png";
-  quality?: number;          // FE: 0..1 for webp/jpeg
+  quality?: number;
 }): Promise<string> {
   const { imageSrc, cropPixels, outWidth, mimeType = "image/webp", quality = 0.86 } = opts;
 
@@ -40,7 +40,6 @@ export async function cropToDataUrl(opts: {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D context not available");
 
-  // FE: High quality scaling.
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 

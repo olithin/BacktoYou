@@ -1,0 +1,12 @@
+name = "fix-lada"
+compatibility_date = "2026-02-01"
+pages_build_output_dir = "dist"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "1cd48a14dd3d4aa0a104ebd2bb03d48b"
+preview_id = "0b001c04e0f44e79bd034ae2ea3b0cb9"
+
+[vars]
+ADMIN_EMAILS = "qaosipova@gmail.com"
+DEV_BYPASS_AUTH = "true"
