@@ -4,7 +4,7 @@ import { Api } from "../app/api";
 import type { ContentBundle, ContentModel, Locale, ServiceCard } from "../app/types";
 import { mdToSafeHtml } from "../app/md";
 import { isLocale } from "../app/locale";
-import "./admin-neumo.css";
+// no theme import here; LayoutAdmin owns admin theme
 
 type SetBundleResult = { ok: true } | { ok: false; reason: string; status?: number; details?: unknown };
 

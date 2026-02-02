@@ -1,21 +1,20 @@
-/* ===== ADMIN ONLY. Everything is scoped under .admin-scope ===== */
+/* ===== ADMIN ONLY. Scoped under .admin-scope ===== */
 
-/* Admin theme variables live ONLY inside admin scope */
-.admin-scope {
+.admin-scope{
     color-scheme: light;
 
-    /* Base palette (soft, like your site tone but cleaner) */
+    /* Clean neumorphic palette */
     --neo-bg: #e9eef5;
     --neo-surface: #e9eef5;
     --neo-text: #1f2937;
     --neo-muted: #6b7280;
 
-    /* Shadows for neumorphism */
     --neo-shadow-dark: rgba(15, 23, 42, 0.14);
     --neo-shadow-light: rgba(255, 255, 255, 0.85);
 
     --neo-radius: 18px;
     --neo-radius-sm: 14px;
+
     --neo-gap: 14px;
 
     --neo-focus: rgba(59, 130, 246, 0.25);
@@ -24,25 +23,21 @@
     --neo-warn: #b45309;
     --neo-ok: #15803d;
 
-    /* Admin root paint */
     min-height: 100vh;
     color: var(--neo-text);
     background: var(--neo-bg);
 }
 
-/* If you want the ultra-soft depth (but ONLY inside admin) */
-.admin-scope {
+/* The admin root area */
+.admin-scope .admin-neo-root{
+    min-height: 100vh;
+    padding: 18px;
+    box-sizing: border-box;
+
     background-image:
             radial-gradient(1200px 800px at 20% 10%, rgba(255,255,255,0.55), transparent 60%),
             radial-gradient(1000px 700px at 80% 0%, rgba(255,255,255,0.35), transparent 55%);
-}
-
-/* Root wrapper */
-.admin-scope .admin-neo-root {
-    min-height: 100vh;
-    background: transparent;
-    padding: 18px;
-    box-sizing: border-box;
+    background-attachment: fixed;
 }
 
 /* Neomorphic surface */
@@ -55,30 +50,20 @@
 }
 
 .admin-scope .neo-pad { padding: 16px; }
-
-.admin-scope .neo-center {
-    max-width: 720px;
-    margin: 80px auto;
-}
+.admin-scope .neo-center { max-width: 720px; margin: 80px auto; }
 
 .admin-scope .neo-title {
     font-weight: 900;
     font-size: 20px;
     letter-spacing: 0.2px;
 }
-
 .admin-scope .neo-h2 {
     font-weight: 900;
     font-size: 18px;
     margin: 0 0 12px 0;
 }
-
 .admin-scope .neo-muted { color: var(--neo-muted); }
-
-.admin-scope .neo-small {
-    font-size: 12px;
-    line-height: 1.35;
-}
+.admin-scope .neo-small { font-size: 12px; line-height: 1.35; }
 
 /* Topbar */
 .admin-scope .admin-topbar {
@@ -88,31 +73,15 @@
     padding-bottom: 12px;
     background: transparent;
 }
-
 .admin-scope .admin-topbar-inner {
     display: grid;
     grid-template-columns: auto auto 1fr auto;
     gap: 12px;
     align-items: center;
 }
-
-.admin-scope .admin-locales {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.admin-scope .admin-status {
-    display: flex;
-    justify-content: center;
-}
-
-.admin-scope .admin-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    align-items: center;
-}
+.admin-scope .admin-locales { display: flex; gap: 8px; align-items: center; }
+.admin-scope .admin-status { display: flex; justify-content: center; }
+.admin-scope .admin-actions { display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
 
 /* Layout: sidebar + main */
 .admin-scope .admin-layout {
@@ -121,7 +90,6 @@
     gap: 16px;
     align-items: start;
 }
-
 .admin-scope .admin-sidebar {
     position: sticky;
     top: 86px;
@@ -129,7 +97,6 @@
     max-height: calc(100vh - 110px);
     overflow: auto;
 }
-
 .admin-scope .admin-main { min-height: 60vh; }
 
 /* Sidebar tabs */
@@ -140,12 +107,7 @@
     font-weight: 800;
     padding: 14px 14px 10px 14px;
 }
-
-.admin-scope .admin-tabs {
-    display: grid;
-    gap: 10px;
-    padding: 0 14px 12px 14px;
-}
+.admin-scope .admin-tabs { display: grid; gap: 10px; padding: 0 14px 12px 14px; }
 
 .admin-scope .neo-tab {
     border: 0;
@@ -159,32 +121,20 @@
             -7px -7px 16px var(--neo-shadow-light);
     transition: transform 120ms ease, box-shadow 120ms ease;
 }
-
 .admin-scope .neo-tab:hover { transform: translateY(-1px); }
-
 .admin-scope .neo-tab:active {
     transform: translateY(0px);
     box-shadow:
             inset 6px 6px 14px rgba(15, 23, 42, 0.18),
             inset -6px -6px 14px rgba(255, 255, 255, 0.75);
 }
-
 .admin-scope .neo-tab-active {
     box-shadow:
             inset 6px 6px 14px rgba(15, 23, 42, 0.18),
             inset -6px -6px 14px rgba(255, 255, 255, 0.75);
 }
-
-.admin-scope .neo-tab-label {
-    font-weight: 900;
-    font-size: 14px;
-}
-
-.admin-scope .neo-tab-hint {
-    margin-top: 4px;
-    font-size: 12px;
-    color: var(--neo-muted);
-}
+.admin-scope .neo-tab-label { font-weight: 900; font-size: 14px; }
+.admin-scope .neo-tab-hint { margin-top: 4px; font-size: 12px; color: var(--neo-muted); }
 
 /* Chips */
 .admin-scope .neo-chip {
@@ -198,7 +148,6 @@
             6px 6px 14px var(--neo-shadow-dark),
             -6px -6px 14px var(--neo-shadow-light);
 }
-
 .admin-scope .neo-chip-active {
     box-shadow:
             inset 6px 6px 14px rgba(15, 23, 42, 0.18),
@@ -218,24 +167,15 @@
             inset 6px 6px 14px rgba(15, 23, 42, 0.14),
             inset -6px -6px 14px rgba(255, 255, 255, 0.75);
 }
-
 .admin-scope .neo-badge-neutral { color: var(--neo-muted); }
-.admin-scope .neo-badge-danger  { color: var(--neo-danger); }
-.admin-scope .neo-badge-warn    { color: var(--neo-warn); }
-.admin-scope .neo-badge-ok      { color: var(--neo-ok); }
+.admin-scope .neo-badge-danger { color: var(--neo-danger); }
+.admin-scope .neo-badge-warn { color: var(--neo-warn); }
+.admin-scope .neo-badge-ok { color: var(--neo-ok); }
 
 /* Fields */
 .admin-scope .neo-field { display: grid; gap: 8px; }
-
-.admin-scope .neo-label {
-    font-weight: 900;
-    font-size: 13px;
-}
-
-.admin-scope .neo-note {
-    font-size: 12px;
-    color: var(--neo-muted);
-}
+.admin-scope .neo-label { font-weight: 900; font-size: 13px; }
+.admin-scope .neo-note { font-size: 12px; color: var(--neo-muted); }
 
 /* Inputs */
 .admin-scope .neo-input,
@@ -253,7 +193,6 @@
             inset 6px 6px 12px rgba(15, 23, 42, 0.18),
             inset -6px -6px 12px rgba(255, 255, 255, 0.80);
 }
-
 .admin-scope .neo-input:focus,
 .admin-scope .neo-textarea:focus,
 .admin-scope select.neo-input:focus {
@@ -262,12 +201,7 @@
             inset -6px -6px 12px rgba(255, 255, 255, 0.80),
             0 0 0 4px var(--neo-focus);
 }
-
-.admin-scope .neo-textarea {
-    resize: vertical;
-    min-height: 120px;
-}
-
+.admin-scope .neo-textarea { resize: vertical; min-height: 120px; }
 .admin-scope .neo-mono {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-size: 12px;
@@ -289,24 +223,15 @@
             -8px -8px 18px var(--neo-shadow-light);
     transition: transform 120ms ease, box-shadow 120ms ease;
 }
-
 .admin-scope .neo-btn:hover { transform: translateY(-1px); }
-
 .admin-scope .neo-btn:active {
     transform: translateY(0px);
     box-shadow:
             inset 6px 6px 14px rgba(15, 23, 42, 0.18),
             inset -6px -6px 14px rgba(255, 255, 255, 0.75);
 }
-
 .admin-scope .neo-btn-primary { background: #e6edf8; }
-
-.admin-scope .neo-btn-big {
-    padding: 14px 18px;
-    font-size: 14px;
-    border-radius: 18px;
-}
-
+.admin-scope .neo-btn-big { padding: 14px 18px; font-size: 14px; border-radius: 18px; }
 .admin-scope .neo-btn-disabled,
 .admin-scope .neo-btn:disabled {
     opacity: 0.55;
@@ -324,27 +249,12 @@
 /* Responsive */
 @media (max-width: 980px) {
     .admin-scope .admin-layout { grid-template-columns: 1fr; }
-
-    .admin-scope .admin-sidebar {
-        position: relative;
-        top: auto;
-        max-height: none;
-    }
-
-    .admin-scope .admin-topbar-inner {
-        grid-template-columns: 1fr;
-        align-items: start;
-    }
-
-    .admin-scope .admin-actions {
-        justify-content: flex-start;
-        flex-wrap: wrap;
-    }
-
+    .admin-scope .admin-sidebar { position: relative; top: auto; max-height: none; }
+    .admin-scope .admin-topbar-inner { grid-template-columns: 1fr; align-items: start; }
+    .admin-scope .admin-actions { justify-content: flex-start; flex-wrap: wrap; }
     .admin-scope .neo-grid-2 { grid-template-columns: 1fr; }
 }
 
-/* Images inside admin surfaces only */
 .admin-scope .neo-surface img {
     display: block;
     width: 100%;

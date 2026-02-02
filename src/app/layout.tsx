@@ -55,6 +55,15 @@ export default function Layout(props: { children: React.ReactNode }) {
     // FE: Keep CSS stable between renders.
     const css = useMemo(
         () => `
+            /* ===== Global page background: use boutique gradient, no image ===== */
+            .vv-pageBg{
+                min-height: 100vh;
+                background:
+                    radial-gradient(1200px 700px at 10% -10%, rgba(183,155,91,0.12), transparent 60%),
+                    radial-gradient(900px 600px at 95% 5%, rgba(107,106,74,0.10), transparent 55%),
+                    linear-gradient(180deg, var(--bg0), var(--bg1));
+            }
+
             .vv-bgOverlay {
                 position: relative;
                 isolation: isolate;
@@ -63,14 +72,15 @@ export default function Layout(props: { children: React.ReactNode }) {
                 content:"";
                 position:absolute;
                 inset:0;
-                background: radial-gradient(1200px 800px at 15% 10%, rgba(255,255,255,0.78), rgba(255,255,255,0.58) 45%, rgba(255,255,255,0.42) 70%, rgba(255,255,255,0.30));
+                /* subtle “milky” overlay to keep neomorphic feel */
+                background: radial-gradient(1200px 800px at 15% 10%,
+                    rgba(255,255,255,0.70),
+                    rgba(255,255,255,0.52) 45%,
+                    rgba(255,255,255,0.38) 70%,
+                    rgba(255,255,255,0.26)
+                );
                 pointer-events:none;
                 z-index:-1;
-            }
-
-            /* FE: iOS/Safari tends to hate background-attachment: fixed */
-            @media (max-width: 768px) {
-                .vv-bgFixed { background-attachment: scroll !important; }
             }
 
             @keyframes vvBreathe {
@@ -176,20 +186,35 @@ export default function Layout(props: { children: React.ReactNode }) {
                 border-radius: 12px;
                 background: linear-gradient(180deg, rgba(126, 87, 194, 1), rgba(98, 63, 165, 1));
             }
+
+            /* ===== Language switch: boutique active pill ===== */
+            .vv-langLink{
+                padding: 6px 10px;
+                border-radius: 10px;
+                border: 1px solid rgba(17,24,39,0.10);
+                background: rgba(255,255,255,0.72);
+                color: rgba(17,24,39,0.78);
+                transition: transform .18s ease, background .18s ease, border-color .18s ease;
+                text-decoration: none;
+            }
+            .vv-langLink:hover{
+                background: rgba(255,255,255,0.86);
+                transform: translateY(-1px);
+            }
+            .vv-langLinkActive{
+                color: white;
+                border-color: rgba(255,255,255,0.0);
+                background: linear-gradient(180deg, var(--accent2), var(--accent));
+                box-shadow:
+                    10px 10px 22px rgba(17,24,39,0.10),
+                    -10px -10px 22px rgba(255,255,255,0.80);
+            }
         `,
         []
     );
 
     return (
-        <div
-            className="min-h-screen vv-bgFixed"
-            style={{
-                backgroundImage: "url(/bg-neomorph.png)",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundAttachment: "fixed",
-            }}
-        >
+        <div className="vv-pageBg">
             <style>{css}</style>
 
             <div className="vv-bgOverlay min-h-screen">
@@ -228,12 +253,10 @@ export default function Layout(props: { children: React.ReactNode }) {
                                 <Link
                                     key={l}
                                     to={langLink(l)}
-                                    className={
-                                        "px-2 py-1 rounded border transition " +
-                                        (l === locale
-                                            ? "bg-zinc-900 text-white border-zinc-900"
-                                            : "bg-white/80 text-zinc-700 border-zinc-200 hover:bg-zinc-50")
-                                    }
+                                    className={[
+                                        "vv-langLink",
+                                        l === locale ? "vv-langLinkActive" : ""
+                                    ].join(" ")}
                                 >
                                     {l.toUpperCase()}
                                 </Link>

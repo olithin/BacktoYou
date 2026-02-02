@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Routes, Route, Navigate, useParams } from "react-router-dom";
-import Layout from "./layout";
+import LayoutSite from "./LayoutSite";
+import LayoutAdmin from "./LayoutAdmin";
 import HomePage from "../pages/HomePage";
 import AdminPage from "../pages/AdminPage";
 import type { Locale } from "../app/types";
@@ -61,32 +62,33 @@ function PersistLang() {
 
 export default function App() {
     return (
-        <Layout>
-            <Routes>
-                <Route path="/" element={<IndexRedirect />} />
-                <Route path="/admin" element={<AdminRedirect />} />
+        <Routes>
+            <Route path="/" element={<IndexRedirect />} />
+            <Route path="/admin" element={<AdminRedirect />} />
 
-                <Route
-                    path="/:lang"
-                    element={
-                        <>
-                            <PersistLang />
-                            <HomePage />
-                        </>
-                    }
-                />
-                <Route
-                    path="/:lang/admin"
-                    element={
-                        <>
-                            <PersistLang />
-                            <AdminPage />
-                        </>
-                    }
-                />
+            {/* ===== PUBLIC SITE ===== */}
+            <Route
+                path="/:lang"
+                element={
+                    <LayoutSite>
+                        <PersistLang />
+                        <HomePage />
+                    </LayoutSite>
+                }
+            />
 
-                <Route path="*" element={<IndexRedirect />} />
-            </Routes>
-        </Layout>
+            {/* ===== ADMIN ===== */}
+            <Route
+                path="/:lang/admin"
+                element={
+                    <LayoutAdmin>
+                        <PersistLang />
+                        <AdminPage />
+                    </LayoutAdmin>
+                }
+            />
+
+            <Route path="*" element={<IndexRedirect />} />
+        </Routes>
     );
 }
