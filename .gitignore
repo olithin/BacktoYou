@@ -12,6 +12,7 @@ node_modules/
 
 # ---------- build outputs ----------
 dist/
+public/uploads-list.json
 dist-ssr/
 .vite/
 .vite-cache/

@@ -16,8 +16,8 @@ const LS_BUNDLE_KEY = "lada_content_bundle_v2_cache";
 const API_CONTENT_URL = "/api/content";
 
 // FE: dev token (only exists in local dev)
-const DEV_ADMIN_TOKEN = (import.meta as any)?.env?.VITE_DEV_ADMIN_TOKEN
-    ? String((import.meta as any).env.VITE_DEV_ADMIN_TOKEN)
+const DEV_ADMIN_TOKEN = import.meta.env.VITE_DEV_ADMIN_TOKEN
+    ? String(import.meta.env.VITE_DEV_ADMIN_TOKEN)
     : "";
 
 function jsonTry<T>(s: string | null): T | null {
@@ -70,7 +70,7 @@ function getOrInitLocale(bundle: ContentBundle, locale: Locale): ContentModel {
     return cloned;
 }
 
-type SetBundleResult = { ok: true } | { ok: false; reason: string; status?: number; details?: unknown };
+export type SetBundleResult = { ok: true } | { ok: false; reason: string; status?: number; details?: unknown };
 
 async function parseErrorBody(res: Response): Promise<string> {
     const txt = await res.text().catch(() => "");

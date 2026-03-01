@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Api } from "../app/api";
-import type { ContentBundle, ContentModel, Locale, ServiceCard } from "../app/types";
+import { nanoid } from "nanoid";
+import { Api, type SetBundleResult } from "../app/api";
+import { LOCALES, type ContentBundle, type ContentModel, type Locale, type ServiceCard } from "../app/types";
 import { mdToSafeHtml } from "../app/md";
 import { isLocale } from "../app/locale";
 // no theme import here; LayoutAdmin owns admin theme
-
-type SetBundleResult = { ok: true } | { ok: false; reason: string; status?: number; details?: unknown };
 
 type TabKey = "site" | "hero" | "about" | "services_section" | "service_cards" | "cta" | "footer" | "raw";
 
@@ -63,7 +62,7 @@ function deepClone<T>(v: T): T {
     return JSON.parse(JSON.stringify(v)) as T;
 }
 
-const SUPPORTED_LOCALES: Locale[] = ["en", "ru", "el"];
+const SUPPORTED_LOCALES = LOCALES;
 
 function ensureLocale(b: ContentBundle, l: Locale): ContentModel {
     const existing = b.content[l];
@@ -451,16 +450,34 @@ export default function AdminPage() {
     const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
     const [saveMsg, setSaveMsg] = useState<string>("");
 
-    const IMAGE_OPTIONS: Array<{ label: string; value: string }> = [
+    const [uploadsList, setUploadsList] = useState<string[]>([]);
+    useEffect(() => {
+        fetch("/uploads-list.json")
+            .then((r) => (r.ok ? r.json() : []))
+            .then((arr: string[]) => (Array.isArray(arr) ? arr : []))
+            .then(setUploadsList)
+            .catch(() => setUploadsList([]));
+    }, []);
+
+    const FALLBACK_IMAGE_OPTIONS: Array<{ label: string; value: string }> = [
         { label: "Hero (hero.webp)", value: "/uploads/hero.webp" },
         { label: "Avatar 1 (avatar-1.webp)", value: "/uploads/avatar-1.webp" },
         { label: "Avatar 2 (avatar-2.webp)", value: "/uploads/avatar-2.webp" },
         { label: "Avatar 3 (avatar-3.webp)", value: "/uploads/avatar-3.webp" },
         { label: "Diploma (diploma.webp)", value: "/uploads/diploma.webp" },
     ];
+    const IMAGE_OPTIONS: Array<{ label: string; value: string }> =
+        uploadsList.length > 0
+            ? uploadsList.map((name) => ({ label: name, value: `/uploads/${name}` }))
+            : FALLBACK_IMAGE_OPTIONS;
 
     function serviceImageOptions(id: string): Array<{ label: string; value: string }> {
-        return [{ label: `service-${id}.webp`, value: `/uploads/service-${id}.webp` }, ...IMAGE_OPTIONS];
+        const base = uploadsList.length > 0
+            ? uploadsList.map((name) => ({ label: name, value: `/uploads/${name}` }))
+            : FALLBACK_IMAGE_OPTIONS;
+        const suggested = { label: `service-${id}.webp`, value: `/uploads/service-${id}.webp` };
+        if (base.some((o) => o.value === suggested.value)) return base;
+        return [suggested, ...base];
     }
 
     const dirty = useMemo(() => {
@@ -648,7 +665,7 @@ export default function AdminPage() {
 
     function addService() {
         mutateBundle((b) => {
-            const id = crypto.randomUUID().slice(0, 10);
+            const id = nanoid(10);
 
             for (const l of SUPPORTED_LOCALES) {
                 const m = ensureLocale(b, l);
@@ -819,7 +836,7 @@ Full description…`
                     <div className="neo-title">Admin</div>
 
                     <div className="admin-locales">
-                        {(["en", "ru", "el"] as const).map((l) => (
+                        {SUPPORTED_LOCALES.map((l) => (
                             <Link
                                 key={l}
                                 to={`/${l}/admin`}

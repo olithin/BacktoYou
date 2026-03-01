@@ -4,15 +4,14 @@ import LayoutSite from "./LayoutSite";
 import LayoutAdmin from "./LayoutAdmin";
 import HomePage from "../pages/HomePage";
 import AdminPage from "../pages/AdminPage";
-import type { Locale } from "../app/types";
+import { LOCALES, type Locale } from "../app/types";
+import { DEFAULT_LOCALE } from "../app/locale";
 
 const LS_LOCALE_KEY = "lada_locale_v1";
-const DEFAULT_LOCALE: Locale = "en";
-const SUPPORTED: Locale[] = ["en", "ru", "el"];
 
 function normLocale(s: string | null | undefined): Locale | null {
     const v = String(s ?? "").toLowerCase().trim();
-    return (SUPPORTED as string[]).includes(v) ? (v as Locale) : null;
+    return (LOCALES as readonly string[]).includes(v) ? (v as Locale) : null;
 }
 
 function browserLocale(): Locale | null {

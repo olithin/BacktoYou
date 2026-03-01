@@ -199,6 +199,14 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
         const anyObj = obj as any;
         if (!anyObj.content || typeof anyObj.content !== "object") return badRequest(request, "Missing 'content' object");
 
+        const defaultLocale = String(anyObj.defaultLocale ?? "").trim();
+        const locales = Array.isArray(anyObj.locales) ? anyObj.locales : [];
+        if (!defaultLocale) return badRequest(request, "Missing 'defaultLocale'");
+        if (!locales.length) return badRequest(request, "Missing 'locales' array");
+        if (!locales.includes(defaultLocale)) {
+            return badRequest(request, "defaultLocale must be included in 'locales'");
+        }
+
         const dataUrlPaths = findDataImageUrls(obj);
         if (dataUrlPaths.length > 0) {
             return badRequest(request, "Images are not allowed in KV. Use /public/uploads and store '/uploads/...'", {
